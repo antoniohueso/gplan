@@ -6,12 +6,10 @@ import (
 )
 
 // Planning Crea una nueva planificación a partir de unas tareas, recursos, vacaciones y fecha de comienzo.
-func Planning(projectPlan ProjectPlan) *Error {
+func Planning(startDate time.Time, projectPlan ProjectPlan) *Error {
 
 	var (
-		name string
-		startDate  time.Time = 
-		tasks      []Task = projectPlan.GetTasks()
+		tasks      []Task     = projectPlan.GetTasks()
 		resources  []Resource = projectPlan.GetResources()
 		feastDays  []Holidays = projectPlan.GetFeastDays()
 		tasksIndex map[TaskID]Task
@@ -22,7 +20,15 @@ func Planning(projectPlan ProjectPlan) *Error {
 
 	tasksIndex, err = validateTasks(tasks, resources)
 	if err != nil {
-		return nil, err
+		return err
+	}
+
+	// Si la fecha de disponibilidad ldel recurso es menor que la fecha en la que debe comenzar el proyecto sele pone la fecha en la que debe comenzar el proyecto
+	// para que no haya ninguna tarea que comeice antes
+	for _, resource := range resources {
+		if resource.GetNextAvailableDate().Before(startDate) {
+			resource.SetNextAvailableDate(startDate)
+		}
 	}
 
 	if feastDays == nil {
@@ -34,32 +40,26 @@ func Planning(projectPlan ProjectPlan) *Error {
 
 		err = assignTask(task, resources, feastDays, tasksIndex)
 		if err != nil {
-			return nil, err
+			return err
 		}
 	}
 
-	plan := ProjectPlan{
-		Name:      name,
-		StartDate: tasks[0].StartDate,
-		EndDate:   tasks[0].EndDate,
-		Tasks:     tasks,
-		Resources: resources,
-		FeastDays: feastDays,
-	}
+	projectPlan.SetStartDate(tasks[0].GetStartDate())
+	projectPlan.SetEndDate(tasks[0].GetEndDate())
 
 	// Busca la fecha de comienzo y de fin del proyecto que será la menor fecha de inicio de una tarea y la mayor
 	// fecha de fin del proyecto
 	for _, task := range tasks {
-		if task.StartDate.Before(plan.StartDate) {
-			plan.StartDate = task.StartDate
+		if task.GetStartDate().Before(projectPlan.GetStartDate()) {
+			projectPlan.SetStartDate(task.GetStartDate())
 		}
-		if task.EndDate.After(plan.EndDate) {
-			plan.EndDate = task.EndDate
+		if task.GetEndDate().After(projectPlan.GetEndDate()) {
+			projectPlan.SetEndDate(task.GetEndDate())
 		}
 
 	}
 
-	return plan, nil
+	return nil
 }
 
 // validateTasks comprueba que las tareas tengan el formato correcto para poder realizar la planificación

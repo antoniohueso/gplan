@@ -79,8 +79,10 @@ type ProjectPlan interface {
 	GetName() string
 	// Fecha planificada de comienzo del proyecto
 	GetStartDate() time.Time
+	SetStartDate(date time.Time)
 	// Fecha planificada de fin del proyecto
 	GetEndDate() time.Time
+	SetEndDate(date time.Time)
 	// Lista de tareas planificadas en el proyecto
 	GetTasks() []Task
 	// Lista de recursos
