@@ -1,29 +1,25 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"log"
 	"time"
 
 	"com.github.antoniohueso/gplan"
+	"com.github.antoniohueso/gplan/defmodel"
 )
 
-type holidaysExt struct {
-	Name string
-	*gplan.Holidays
-}
-
 func main() {
+	h := defmodel.NewHolidays(time.Now(), time.Now())
 
-	h := &holidaysExt{
-		Holidays: gplan.NewHolidays(time.Now(), time.Now()),
-		Name:     "Pollas",
+	r := defmodel.NewResource("ahg", "Antonio Hueso", "backend", time.Now(), []gplan.Holidays{h})
+
+	b, err := json.Marshal(r)
+	if err != nil {
+		log.Fatal(err)
 	}
-	h2 := &holidaysExt{
-		Holidays: gplan.NewHolidays(time.Now(), time.Now()),
-		Name:     "Pollas2",
-	}
 
-	r := gplan.NewResource("Antoño", "Hueso", "backend", time.Now().AddDate(0, 1, 0), h, h2)
+	fmt.Println(string(b))
 
-	fmt.Printf("%v\n", r.GetHolidays()[0].GetFrom())
 }
