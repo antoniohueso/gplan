@@ -10,7 +10,10 @@ import (
 	"com.github.antoniohueso/gplan/defmodel"
 )
 
+type arr []interface{}
+
 func main() {
+
 	h := defmodel.NewHolidays(time.Now(), time.Now())
 
 	r := defmodel.NewResource("ahg", "Antonio Hueso", "backend", time.Now(), []gplan.Holidays{h})
