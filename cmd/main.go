@@ -1,28 +1,27 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
-	"log"
 	"time"
 
 	"com.github.antoniohueso/gplan"
 	"com.github.antoniohueso/gplan/defmodel"
 )
 
-type arr []interface{}
-
 func main() {
 
 	h := defmodel.NewHolidays(time.Now(), time.Now())
+	h1 := defmodel.NewHolidays(time.Now().AddDate(0, 1, 0), time.Now().AddDate(0, 1, 0))
 
-	r := defmodel.NewResource("ahg", "Antonio Hueso", "backend", time.Now(), []gplan.Holidays{h})
+	r := defmodel.NewResource("ahg", "Antonio Hueso", "backend", time.Now(), defmodel.ArrayOfHolidays{h, h1})
 
-	b, err := json.Marshal(r)
-	if err != nil {
-		log.Fatal(err)
+	prueba(r)
+}
+
+func prueba(r gplan.Resource) {
+
+	for _, h := range r.GetHolidays().Iterable() {
+		fmt.Printf("%v\n", h.GetFrom())
 	}
-
-	fmt.Println(string(b))
 
 }
