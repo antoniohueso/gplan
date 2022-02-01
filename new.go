@@ -8,10 +8,13 @@ import (
 // Planning Crea una nueva planificación a partir de unas tareas, recursos, vacaciones y fecha de comienzo.
 func Planning(startDate time.Time, projectPlan ProjectPlan) *Error {
 
+	// Ordena las tareas por número de orden para poder planificarlas
+	projectPlan.GetTasks().SortByOrder()
+
 	var (
-		tasks      []Task     = projectPlan.GetTasks()
-		resources  []Resource = projectPlan.GetResources()
-		feastDays  []Holidays = projectPlan.GetFeastDays()
+		tasks      []Task     = projectPlan.GetTasks().Iterable()
+		resources  []Resource = projectPlan.GetResources().Iterable()
+		feastDays  []Holidays = projectPlan.GetFeastDays().Iterable()
 		tasksIndex map[TaskID]Task
 		err        *Error
 	)
@@ -62,8 +65,11 @@ func Planning(startDate time.Time, projectPlan ProjectPlan) *Error {
 }
 
 // validateTasks comprueba que las tareas tengan el formato correcto para poder realizar la planificación
-func validateTasks(tasks []Task, resources []Resource) (map[TaskID]Task, *Error) {
-	var taskIDSErrors []TaskID
+func validateTasks(aTasks []Task, resources []Resource) (map[TaskID]Task, *Error) {
+	var (
+		taskIDSErrors []TaskID
+		tasks         []Task = aTasks
+	)
 
 	// La lista de tareas no puede estar vacía
 	if len(tasks) == 0 {
@@ -131,14 +137,14 @@ func validateTasks(tasks []Task, resources []Resource) (map[TaskID]Task, *Error)
 	for _, task := range tasks {
 
 		// Revisa las tareas a las que bloquea
-		for _, dep := range task.GetBlocksTo() {
+		for _, dep := range task.GetBlocksTo().Iterable() {
 			if _, exist := tasksIndex[dep.GetTaskID()]; !exist {
 				tasksNotExists[dep.GetTaskID()] = true
 			}
 		}
 
 		// Revisa las tareas que le bloquean
-		for _, dep := range task.GetBlocksBy() {
+		for _, dep := range task.GetBlocksBy().Iterable() {
 			if _, exist := tasksIndex[dep.GetTaskID()]; !exist {
 				tasksNotExists[dep.GetTaskID()] = true
 			}
@@ -161,14 +167,9 @@ func validateTasks(tasks []Task, resources []Resource) (map[TaskID]Task, *Error)
 		}
 	}
 
-	// Ordena las tareas por número de orden para poder planificarlas
-	sort.Slice(tasks, func(i, j int) bool {
-		return tasks[i].GetOrder() < tasks[j].GetOrder()
-	})
-
 	// No puede haber tareas con un orden superior que bloqueen a otras con un número de orden inferior o igual
 	for _, task := range tasks {
-		for _, dep := range task.GetBlocksTo() {
+		for _, dep := range task.GetBlocksTo().Iterable() {
 			taskBlocked := tasksIndex[dep.GetTaskID()]
 			if taskBlocked != nil {
 				if task.GetOrder() >= taskBlocked.GetOrder() {
@@ -197,7 +198,7 @@ func checkForCircularDependencies(task Task, tasksIndex map[TaskID]Task, linkedb
 	}
 
 	// Recorre las tareas a las que está bloqueando llamando recursivamente a la propia función
-	for _, dep := range task.GetBlocksTo() {
+	for _, dep := range task.GetBlocksTo().Iterable() {
 		// Añade task.ID a la secuencia de bloqueos para detectar una posible referencia circular a ella misma en
 		// dicho encadenamiento
 		linkedblocksTo = append(linkedblocksTo, task.GetID())
@@ -240,16 +241,18 @@ func assignTask(task Task, resources []Resource, feastDays []Holidays, tasksInde
 // calcula la fecha mayor de las que bloquean a la tarea, ya que no se podrá empezar antes.
 func getRealStartDate(task Task, tasksIndex map[TaskID]Task) (time.Time, *Error) {
 
+	var blocksBy []TaskDependency = task.GetBlocksBy().Iterable()
+
 	// Si no tiene tareas que la bloqueen retorna la misma fecha de comienzo
-	if len(task.GetBlocksBy()) == 0 {
+	if len(blocksBy) == 0 {
 		return task.GetStartDate(), nil
 	}
 
-	var blocksBy []Task
+	var tasksBlocksBy []Task
 
 	// Las tareas que la bloquean en una lista de tareas ordenadas primero por las que bloquean a otros deberían
 	// estar ya planificadas, si no lo están damos error
-	for _, dep := range task.GetBlocksBy() {
+	for _, dep := range blocksBy {
 
 		taskBlocksBy := tasksIndex[dep.GetTaskID()]
 
@@ -258,16 +261,16 @@ func getRealStartDate(task Task, tasksIndex map[TaskID]Task) (time.Time, *Error)
 			return time.Time{}, newTextError("La tarea %s no está planificada y bloquea a la tarea %s que está en planificación", dep.GetTaskID(), task.GetID())
 		}
 
-		blocksBy = append(blocksBy, taskBlocksBy)
+		tasksBlocksBy = append(tasksBlocksBy, taskBlocksBy)
 	}
 
 	// Ordena blocksBy por fecha de fin de tarea descendiente para encontrar la fecha mayor
-	sort.Slice(blocksBy, func(i, j int) bool {
-		return blocksBy[i].GetEndDate().After(blocksBy[j].GetEndDate())
+	sort.Slice(tasksBlocksBy, func(i, j int) bool {
+		return tasksBlocksBy[i].GetEndDate().After(tasksBlocksBy[j].GetEndDate())
 	})
 
 	// Retorna la fecha mayor + 1 día ya que debe comenzar al día siguiente de la fecha de fin de la última tarea que la bloquean
-	return blocksBy[0].GetEndDate().AddDate(0, 0, 1), nil
+	return tasksBlocksBy[0].GetEndDate().AddDate(0, 0, 1), nil
 
 }
 
@@ -316,7 +319,7 @@ func scheduledTask(task Task, resource Resource, feastDays []Holidays) *schedule
 	)
 
 	// concatena días de fiesta y vacaciones del recurso
-	holidaysAndFeastDays = append(holidaysAndFeastDays, resource.GetHolidays()...)
+	holidaysAndFeastDays = append(holidaysAndFeastDays, resource.GetHolidays().Iterable()...)
 	holidaysAndFeastDays = append(holidaysAndFeastDays, feastDays...)
 
 	// Si la fecha en la que debe comenzar la tarea es superior a la fecha en la que el recurso estaría disponible
