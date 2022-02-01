@@ -116,7 +116,7 @@ type ProjectPlan interface {
 	SetEstimatedComplete(n int)
 	// Avance o retraso real en días
 	GetRealAdvancedOrDelayed() float64
-	SetRealAdvancedOrDelayed(n float64) float64
+	SetRealAdvancedOrDelayed(n float64)
 	// Si está archivado o no
 	IsArchived() bool
 	SetArchived(archived bool)

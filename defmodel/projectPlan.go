@@ -27,8 +27,20 @@ type ProjectPlan struct {
 	EstimatedComplete int
 	// Avance o retraso real en días
 	RealAdvancedOrDelayed float64
+	// Indica si está archivado o no
+	Archived bool
 	// Fecha en la que el proyecto fue archivado
-	ArchivedDate *time.Time `bson:"archivedDate"`
+	ArchivedDate time.Time `bson:"archivedDate"`
+}
+
+// NewProjectPlan crea un nuevo plan de proyecto para poder ser planificado o revisado
+func NewProjectPlan(id gplan.ProjectPlanID, tasks ArrayOfTasks, resources ArrayOfResources, feastDays ArrayOfHolidays) *ProjectPlan {
+	return &ProjectPlan{
+		ID:        id,
+		Tasks:     tasks,
+		Resources: resources,
+		FeastDays: feastDays,
+	}
 }
 
 // GetID Getter de ID
@@ -62,12 +74,12 @@ func (p ProjectPlan) GetTasks() gplan.ArrayOfTasks {
 }
 
 // GetResources Getter de Resources
-func (p ProjectPlan) GetResources() ArrayOfResources {
+func (p ProjectPlan) GetResources() gplan.ArrayOfResources {
 	return p.Resources
 }
 
 // GetFeastDays Getter de FeastDays
-func (p ProjectPlan) GetFeastDays() ArrayOfHolidays {
+func (p ProjectPlan) GetFeastDays() gplan.ArrayOfHolidays {
 	return p.FeastDays
 }
 
@@ -91,15 +103,32 @@ func (p *ProjectPlan) SetEstimatedComplete(n int) {
 	p.EstimatedComplete = n
 }
 
-// ProjectPlan interfaz para implementar el acceso a la información necesaria para poder crear o revisar una planificación
-type ProjectPlan1 interface {
-	// Avance o retraso real en días
-	GetRealAdvancedOrDelayed() float64
-	SetRealAdvancedOrDelayed(n float64) float64
-	// Si está archivado o no
-	IsArchived() bool
-	SetArchived(archived bool)
-	// Fecha en la que el proyecto fue archivado
-	GetArchivedDate() time.Time
-	SetArchivedDate(date time.Time)
+// GetRealAdvancedOrDelayed Getter de RealAdvancedOrDelayed
+func (p ProjectPlan) GetRealAdvancedOrDelayed() float64 {
+	return p.RealAdvancedOrDelayed
+}
+
+// SetRealAdvancedOrDelayed Setter de RealAdvancedOrDelayed
+func (p *ProjectPlan) SetRealAdvancedOrDelayed(n float64) {
+	p.RealAdvancedOrDelayed = n
+}
+
+// IsArchived Getter de Archived
+func (p ProjectPlan) IsArchived() bool {
+	return p.Archived
+}
+
+// SetArchived Getter de Archived
+func (p *ProjectPlan) SetArchived(archived bool) {
+	p.Archived = archived
+}
+
+// GetArchivedDate Getter de ArchivedDate
+func (p ProjectPlan) GetArchivedDate() time.Time {
+	return p.ArchivedDate
+}
+
+// SetArchivedDate Setter de ArchivedDate
+func (p *ProjectPlan) SetArchivedDate(date time.Time) {
+	p.ArchivedDate = date
 }

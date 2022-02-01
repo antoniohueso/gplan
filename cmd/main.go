@@ -15,13 +15,23 @@ func main() {
 
 	r := defmodel.NewResource("ahg", "Antonio Hueso", "backend", time.Now(), defmodel.ArrayOfHolidays{h, h1})
 
-	prueba(r)
+	var tasks []*defmodel.Task
+
+	for i := 0; i < 10; i++ {
+		tasks = append(tasks, defmodel.NewTask(gplan.TaskID(fmt.Sprintf("Tarea-%d", i)), "summary sample", "backend", i, i*2))
+	}
+
+	plan := defmodel.NewProjectPlan("myPlan", tasks, defmodel.ArrayOfResources{r}, defmodel.ArrayOfHolidays{h})
+
+	prueba(plan)
 }
 
-func prueba(r gplan.Resource) {
+func prueba(p gplan.ProjectPlan) {
 
-	for _, h := range r.GetHolidays().Iterable() {
-		fmt.Printf("%v\n", h.GetFrom())
+	p.GetTasks().SortByOrder()
+
+	for _, t := range p.GetTasks().Iterable() {
+		fmt.Printf("%v\n", t)
 	}
 
 }
