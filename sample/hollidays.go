@@ -1,4 +1,4 @@
-package gplan
+package sample
 
 import (
 	"time"

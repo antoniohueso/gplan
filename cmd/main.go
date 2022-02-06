@@ -6,15 +6,16 @@ import (
 	"time"
 
 	"com.github.antoniohueso/gplan"
+	. "com.github.antoniohueso/gplan/sample"
 )
 
 type TaskExt struct {
-	*gplan.Task
+	*Task
 	Status string
 }
 
 type ProjectPlanExt struct {
-	*gplan.ProjectPlan
+	*ProjectPlan
 	Tasks []*TaskExt
 }
 
@@ -37,27 +38,27 @@ func (p ProjectPlanExt) SortTasksByOrder() {
 
 func main() {
 
-	h := gplan.NewHolidays(time.Now(), time.Now())
-	h1 := gplan.NewHolidays(time.Now().AddDate(0, 1, 0), time.Now().AddDate(0, 1, 0))
+	h := NewHolidays(time.Now(), time.Now())
+	h1 := NewHolidays(time.Now().AddDate(0, 1, 0), time.Now().AddDate(0, 1, 0))
 
-	r := gplan.NewResource("ahg", "Antonio Hueso", "backend", time.Now(), []*gplan.Holidays{h, h1})
+	r := NewResource("ahg", "Antonio Hueso", "backend", time.Now(), []*Holidays{h, h1})
 
 	var tasks []*TaskExt
 
 	for i := 0; i < 10; i++ {
 		task := &TaskExt{
-			Task:   gplan.NewTask(gplan.TaskID(fmt.Sprintf("Tarea-%d", i)), "summary sample", "backend", i, i*2),
+			Task:   NewTask(gplan.TaskID(fmt.Sprintf("Tarea-%d", i)), "summary sample", "backend", i, i*2),
 			Status: "Backlog",
 		}
 		tasks = append(tasks, task)
 	}
 
 	plan := &ProjectPlanExt{
-		ProjectPlan: &gplan.ProjectPlan{},
+		ProjectPlan: &ProjectPlan{},
 	}
 	plan.Tasks = tasks
-	plan.Resources = []*gplan.Resource{r}
-	plan.FeastDays = []*gplan.Holidays{h}
+	plan.Resources = []*Resource{r}
+	plan.FeastDays = []*Holidays{h}
 
 	prueba(plan)
 }

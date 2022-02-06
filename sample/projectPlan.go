@@ -1,15 +1,17 @@
-package gplan
+package sample
 
 import (
 	"sort"
 	"time"
+
+	"com.github.antoniohueso/gplan"
 )
 
 // ProjectPlan Contiene información de la planificación del proyecto
 // Solo pongo etiquetas bson a aquellas por las que voy a buscar o de lo contrario no funciona
 type ProjectPlan struct {
 	// Identificador del plan de proyecto
-	ID ProjectPlanID `bson:"_id"`
+	ID gplan.ProjectPlanID `bson:"_id"`
 	// Fecha planificada de comienzo del proyecto
 	StartDate time.Time `bson:"startDate"`
 	// Fecha planificada de fin del proyecto
@@ -33,7 +35,7 @@ type ProjectPlan struct {
 }
 
 // NewProjectPlan crea un nuevo plan de proyecto para poder ser planificado o revisado
-func NewProjectPlan(id ProjectPlanID, tasks []*Task, resources []*Resource, feastDays []*Holidays) *ProjectPlan {
+func NewProjectPlan(id gplan.ProjectPlanID, tasks []*Task, resources []*Resource, feastDays []*Holidays) *ProjectPlan {
 	return &ProjectPlan{
 		ID:        id,
 		Tasks:     tasks,
@@ -43,7 +45,7 @@ func NewProjectPlan(id ProjectPlanID, tasks []*Task, resources []*Resource, feas
 }
 
 // GetID Getter de ID
-func (p ProjectPlan) GetID() ProjectPlanID {
+func (p ProjectPlan) GetID() gplan.ProjectPlanID {
 	return p.ID
 }
 
@@ -68,8 +70,8 @@ func (p *ProjectPlan) SetEndDate(date time.Time) {
 }
 
 // GetTasks Devuelve un array de Task
-func (p ProjectPlan) GetTasks() []ITask {
-	newArr := make([]ITask, len(p.Tasks))
+func (p ProjectPlan) GetTasks() []gplan.ITask {
+	newArr := make([]gplan.ITask, len(p.Tasks))
 	for i := range p.Tasks {
 		newArr[i] = p.Tasks[i]
 	}
@@ -85,8 +87,8 @@ func (p ProjectPlan) SortTasksByOrder() {
 }
 
 // GetResources Devuelve un nuevo array de Resources
-func (p ProjectPlan) GetResources() []IResource {
-	newArr := make([]IResource, len(p.Resources))
+func (p ProjectPlan) GetResources() []gplan.IResource {
+	newArr := make([]gplan.IResource, len(p.Resources))
 	for i := range p.Resources {
 		newArr[i] = p.Resources[i]
 	}
@@ -94,8 +96,8 @@ func (p ProjectPlan) GetResources() []IResource {
 }
 
 // GetFeastDays Devuelve un nuevo array de Holidays
-func (p ProjectPlan) GetFeastDays() []IHolidays {
-	newArr := make([]IHolidays, len(p.FeastDays))
+func (p ProjectPlan) GetFeastDays() []gplan.IHolidays {
+	newArr := make([]gplan.IHolidays, len(p.FeastDays))
 	for i := range p.FeastDays {
 		newArr[i] = p.FeastDays[i]
 	}

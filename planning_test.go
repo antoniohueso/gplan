@@ -6,35 +6,36 @@ import (
 	"time"
 
 	"com.github.antoniohueso/gplan"
+	. "com.github.antoniohueso/gplan/sample"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Planning", func() {
+var _ = Describe("gplan.Planning", func() {
 
 	var (
-		resources []*gplan.Resource
-		feastDays []*gplan.Holidays
+		resources []*Resource
+		feastDays []*Holidays
 	)
 
 	BeforeEach(func() {
 
-		resources = []*gplan.Resource{
-			gplan.NewResource("ahg", "Antonio Hueso", "backend", parseDate("2021-06-10"), []*gplan.Holidays{
-				gplan.NewHolidays(parseDate("2021-06-17"), parseDate("2021-06-18")),
+		resources = []*Resource{
+			NewResource("ahg", "Antonio Hueso", "backend", parseDate("2021-06-10"), []*Holidays{
+				NewHolidays(parseDate("2021-06-17"), parseDate("2021-06-18")),
 			}),
-			gplan.NewResource("cslopez", "Carlos Sobrino", "backend", parseDate("2021-06-07"), nil),
-			gplan.NewResource("David.Attrache", "David Attrache", "maquetacion", parseDate("2021-06-07"), nil),
-			gplan.NewResource("Noemi", "Noe Medina", "maquetacion", parseDate("2021-06-07"), nil),
+			NewResource("cslopez", "Carlos Sobrino", "backend", parseDate("2021-06-07"), nil),
+			NewResource("David.Attrache", "David Attrache", "maquetacion", parseDate("2021-06-07"), nil),
+			NewResource("Noemi", "Noe Medina", "maquetacion", parseDate("2021-06-07"), nil),
 		}
 
-		feastDays = []*gplan.Holidays{
-			gplan.NewHolidays(parseDate("2021-06-10"), parseDate("2021-06-11")),
+		feastDays = []*Holidays{
+			NewHolidays(parseDate("2021-06-10"), parseDate("2021-06-11")),
 		}
 
 	})
 
-	Describe("NewPlanning - Validaciones", func() {
+	Describe("Newgplan.Planning - Validaciones", func() {
 
 		println(resources)
 		println(feastDays)
@@ -42,7 +43,7 @@ var _ = Describe("Planning", func() {
 		Context("Si recibe una lista de tareas vacía", func() {
 			It("Debe devolver un error", func() {
 
-				plan := gplan.NewProjectPlan("test", nil, nil, nil)
+				plan := NewProjectPlan("test", nil, nil, nil)
 
 				err := gplan.Planning(time.Now(), plan)
 				Expect(err).ShouldNot(BeNil())
@@ -53,7 +54,7 @@ var _ = Describe("Planning", func() {
 		Context("Si recibe una lista de recursos vacía", func() {
 			It("Debe devolver un error", func() {
 
-				plan := gplan.NewProjectPlan("test", []*gplan.Task{{}}, nil, nil)
+				plan := NewProjectPlan("test", []*Task{{}}, nil, nil)
 				err := gplan.Planning(time.Now(), plan)
 				Expect(err).ShouldNot(BeNil())
 				Expect(err.Message).Should(Equal(fmt.Errorf("la lista de recursos a asignar está vacía")))
@@ -63,10 +64,10 @@ var _ = Describe("Planning", func() {
 		Context("Si hay tareas con una duración < 1", func() {
 
 			It("Debe devolver un error", func() {
-				plan := gplan.NewProjectPlan("test", []*gplan.Task{
-					gplan.NewTask("Task-2", "summary Task-2", "maquetación", 100, 1),
-					gplan.NewTask("Task-1", "summary Task-1", "maquetación", 100, 0)},
-					[]*gplan.Resource{{}},
+				plan := NewProjectPlan("test", []*Task{
+					NewTask("Task-2", "summary Task-2", "maquetación", 100, 1),
+					NewTask("Task-1", "summary Task-1", "maquetación", 100, 0)},
+					[]*Resource{{}},
 					nil)
 
 				err := gplan.Planning(time.Now(), plan)
@@ -82,11 +83,11 @@ var _ = Describe("Planning", func() {
 
 			It("Debe devolver un error", func() {
 
-				plan := gplan.NewProjectPlan("test", []*gplan.Task{
-					gplan.NewTask("Task-2", "summary Task-2", "maquetación", 100, 1),
-					gplan.NewTask("Task-1", "summary Task-1", "backend", 100, 2)},
-					[]*gplan.Resource{
-						gplan.NewResource("ahg", "Antonio Hueso", "backend", time.Now(), nil),
+				plan := NewProjectPlan("test", []*Task{
+					NewTask("Task-2", "summary Task-2", "maquetación", 100, 1),
+					NewTask("Task-1", "summary Task-1", "backend", 100, 2)},
+					[]*Resource{
+						NewResource("ahg", "Antonio Hueso", "backend", time.Now(), nil),
 					},
 					nil)
 
@@ -103,12 +104,12 @@ var _ = Describe("Planning", func() {
 
 			It("Debe devolver un error", func() {
 
-				plan := gplan.NewProjectPlan("test",
-					[]*gplan.Task{
-						gplan.NewTask("Task-2", "summary Task-2", "maquetación", 100, 1),
+				plan := NewProjectPlan("test",
+					[]*Task{
+						NewTask("Task-2", "summary Task-2", "maquetación", 100, 1),
 					},
-					[]*gplan.Resource{
-						gplan.NewResource("ahg", "Antonio Hueso", "backend", time.Now(), nil),
+					[]*Resource{
+						NewResource("ahg", "Antonio Hueso", "backend", time.Now(), nil),
 					},
 					nil)
 
@@ -122,12 +123,12 @@ var _ = Describe("Planning", func() {
 		Context("Si hay referencias circulares simples", func() {
 
 			It("Debe devolver un error", func() {
-				task1 := gplan.NewTaskWithBlocks("Task-1", "summary Task-1", "backend", 10, 1, []*gplan.TaskDependency{gplan.NewTaskDependency("Task-2")}, nil)
-				task2 := gplan.NewTaskWithBlocks("Task-2", "summary Task-2", "backend", 20, 2, []*gplan.TaskDependency{gplan.NewTaskDependency("Task-1")}, nil)
+				task1 := NewTaskWithBlocks("Task-1", "summary Task-1", "backend", 10, 1, []*TaskDependency{NewTaskDependency("Task-2")}, nil)
+				task2 := NewTaskWithBlocks("Task-2", "summary Task-2", "backend", 20, 2, []*TaskDependency{NewTaskDependency("Task-1")}, nil)
 
-				plan := gplan.NewProjectPlan("test",
-					[]*gplan.Task{task1, task2},
-					[]*gplan.Resource{gplan.NewResource("ahg", "Antonio Hueso", "backend", time.Now(), nil)},
+				plan := NewProjectPlan("test",
+					[]*Task{task1, task2},
+					[]*Resource{NewResource("ahg", "Antonio Hueso", "backend", time.Now(), nil)},
 					nil)
 
 				err := gplan.Planning(time.Now(), plan)
@@ -140,13 +141,13 @@ var _ = Describe("Planning", func() {
 		Context("Si hay referencias circulares complejas", func() {
 
 			It("Debe devolver un error", func() {
-				task1 := gplan.NewTaskWithBlocks("Task-1", "summary Task-1", "backend", 10, 1, []*gplan.TaskDependency{gplan.NewTaskDependency("Task-2")}, nil)
-				task2 := gplan.NewTaskWithBlocks("Task-2", "summary Task-2", "backend", 20, 2, []*gplan.TaskDependency{gplan.NewTaskDependency("Task-3")}, nil)
-				task3 := gplan.NewTaskWithBlocks("Task-3", "summary Task-3", "backend", 30, 2, []*gplan.TaskDependency{gplan.NewTaskDependency("Task-1")}, nil)
+				task1 := NewTaskWithBlocks("Task-1", "summary Task-1", "backend", 10, 1, []*TaskDependency{NewTaskDependency("Task-2")}, nil)
+				task2 := NewTaskWithBlocks("Task-2", "summary Task-2", "backend", 20, 2, []*TaskDependency{NewTaskDependency("Task-3")}, nil)
+				task3 := NewTaskWithBlocks("Task-3", "summary Task-3", "backend", 30, 2, []*TaskDependency{NewTaskDependency("Task-1")}, nil)
 
-				plan := gplan.NewProjectPlan("test",
-					[]*gplan.Task{task1, task2, task3},
-					[]*gplan.Resource{gplan.NewResource("ahg", "Antonio Hueso", "backend", time.Now(), nil)},
+				plan := NewProjectPlan("test",
+					[]*Task{task1, task2, task3},
+					[]*Resource{NewResource("ahg", "Antonio Hueso", "backend", time.Now(), nil)},
 					nil)
 
 				err := gplan.Planning(time.Now(), plan)
@@ -159,13 +160,13 @@ var _ = Describe("Planning", func() {
 		Context("Si hay tareas que bloquean a tareas que no existen en la lista de tareas", func() {
 
 			It("Debe devolver un error", func() {
-				task1 := gplan.NewTaskWithBlocks("Task-1", "summary Task-1", "backend", 10, 1, []*gplan.TaskDependency{gplan.NewTaskDependency("Task-No-Existe")}, nil)
-				task2 := gplan.NewTaskWithBlocks("Task-2", "summary Task-2", "backend", 20, 2, nil, nil)
-				task3 := gplan.NewTaskWithBlocks("Task-3", "summary Task-3", "backend", 30, 2, nil, nil)
+				task1 := NewTaskWithBlocks("Task-1", "summary Task-1", "backend", 10, 1, []*TaskDependency{NewTaskDependency("Task-No-Existe")}, nil)
+				task2 := NewTaskWithBlocks("Task-2", "summary Task-2", "backend", 20, 2, nil, nil)
+				task3 := NewTaskWithBlocks("Task-3", "summary Task-3", "backend", 30, 2, nil, nil)
 
-				plan := gplan.NewProjectPlan("test",
-					[]*gplan.Task{task1, task2, task3},
-					[]*gplan.Resource{gplan.NewResource("ahg", "Antonio Hueso", "backend", time.Now(), nil)},
+				plan := NewProjectPlan("test",
+					[]*Task{task1, task2, task3},
+					[]*Resource{NewResource("ahg", "Antonio Hueso", "backend", time.Now(), nil)},
 					nil)
 				err := gplan.Planning(time.Now(), plan)
 				Expect(err).ShouldNot(BeNil())
@@ -178,12 +179,12 @@ var _ = Describe("Planning", func() {
 		Context("Si hay tareas que bloquean a otras cuyo orden es inferior", func() {
 
 			It("Debe devolver un error", func() {
-				task1 := gplan.NewTaskWithBlocks("Task-1", "summary Task-1", "backend", 20, 1, []*gplan.TaskDependency{gplan.NewTaskDependency("Task-2")}, nil)
-				task2 := gplan.NewTaskWithBlocks("Task-2", "summary Task-2", "backend", 10, 2, nil, nil)
+				task1 := NewTaskWithBlocks("Task-1", "summary Task-1", "backend", 20, 1, []*TaskDependency{NewTaskDependency("Task-2")}, nil)
+				task2 := NewTaskWithBlocks("Task-2", "summary Task-2", "backend", 10, 2, nil, nil)
 
-				plan := gplan.NewProjectPlan("test",
-					[]*gplan.Task{task1, task2},
-					[]*gplan.Resource{gplan.NewResource("ahg", "Antonio Hueso", "backend", time.Now(), nil)},
+				plan := NewProjectPlan("test",
+					[]*Task{task1, task2},
+					[]*Resource{NewResource("ahg", "Antonio Hueso", "backend", time.Now(), nil)},
 					nil)
 				err := gplan.Planning(time.Now(), plan)
 				Expect(err).ShouldNot(BeNil())
@@ -195,21 +196,21 @@ var _ = Describe("Planning", func() {
 
 	})
 
-	Describe("NewPlanning - Creación", func() {
+	Describe("Newgplan.Planning - Creación", func() {
 		Context("Creamos un plan sin dependencias con dos días de fiesta", func() {
 
 			It("El plan debe ser igual al siguiente plan", func() {
 
-				tasks := []*gplan.Task{
-					gplan.NewTask("Tarea1", "Summary", "backend", 10, 10),
-					gplan.NewTask("Tarea2", "Summary", "maquetacion", 50, 2),
-					gplan.NewTask("Tarea3", "Summary", "backend", 20, 1),
-					gplan.NewTask("Tarea4", "Summary", "maquetacion", 60, 20),
-					gplan.NewTask("Tarea5", "Summary", "backend", 30, 7),
-					gplan.NewTask("Tarea6", "Summary", "backend", 40, 9),
+				tasks := []*Task{
+					NewTask("Tarea1", "Summary", "backend", 10, 10),
+					NewTask("Tarea2", "Summary", "maquetacion", 50, 2),
+					NewTask("Tarea3", "Summary", "backend", 20, 1),
+					NewTask("Tarea4", "Summary", "maquetacion", 60, 20),
+					NewTask("Tarea5", "Summary", "backend", 30, 7),
+					NewTask("Tarea6", "Summary", "backend", 40, 9),
 				}
 
-				plan := gplan.NewProjectPlan("test-plan", tasks, resources, feastDays)
+				plan := NewProjectPlan("test-plan", tasks, resources, feastDays)
 				err := gplan.Planning(parseDate("2021-06-07"), plan)
 
 				Expect(err).Should(BeNil())
@@ -230,20 +231,20 @@ var _ = Describe("Planning", func() {
 
 			It("El plan debe ser igual al siguiente plan", func() {
 
-				tasks := []*gplan.Task{
-					gplan.NewTask("Tarea1", "Summary", "backend", 30, 10),
-					gplan.NewTask("Tarea2", "Summary", "maquetacion", 50, 2),
-					gplan.NewTask("Tarea3", "Summary", "backend", 40, 1),
-					gplan.NewTask("Tarea4", "Summary", "maquetacion", 20, 20),
-					gplan.NewTask("Tarea5", "Summary", "backend", 60, 7),
-					gplan.NewTask("Tarea6", "Summary", "backend", 10, 9),
+				tasks := []*Task{
+					NewTask("Tarea1", "Summary", "backend", 30, 10),
+					NewTask("Tarea2", "Summary", "maquetacion", 50, 2),
+					NewTask("Tarea3", "Summary", "backend", 40, 1),
+					NewTask("Tarea4", "Summary", "maquetacion", 20, 20),
+					NewTask("Tarea5", "Summary", "backend", 60, 7),
+					NewTask("Tarea6", "Summary", "backend", 10, 9),
 				}
 
-				gplan.BlocksTo(tasks[3], tasks[0])
-				gplan.BlocksTo(tasks[5], tasks[2])
-				gplan.BlocksTo(tasks[5], tasks[1])
+				BlocksTo(tasks[3], tasks[0])
+				BlocksTo(tasks[5], tasks[2])
+				BlocksTo(tasks[5], tasks[1])
 
-				plan := gplan.NewProjectPlan("test-plan", tasks, resources, feastDays)
+				plan := NewProjectPlan("test-plan", tasks, resources, feastDays)
 				err := gplan.Planning(parseDate("2021-06-07"), plan)
 
 				Expect(err).Should(BeNil())
@@ -264,7 +265,7 @@ var _ = Describe("Planning", func() {
 
 })
 
-func printPlan(plan *gplan.ProjectPlan) {
+func printPlan(plan *ProjectPlan) {
 	fmt.Println()
 	for _, task := range plan.Tasks {
 		fmt.Printf("%s|%02d|%s|%s|%s\n", task.ID, task.Duration, task.StartDate.Format("2006-01-02"), task.EndDate.Format("2006-01-02"),
@@ -272,7 +273,7 @@ func printPlan(plan *gplan.ProjectPlan) {
 	}
 }
 
-func comparePlan(tasks []*gplan.Task, compare []string) {
+func comparePlan(tasks []*Task, compare []string) {
 	var sTasks []string
 
 	for i := range tasks {
