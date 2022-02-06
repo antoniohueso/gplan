@@ -1,7 +1,6 @@
 package defmodel
 
 import (
-	"sort"
 	"time"
 
 	"com.github.antoniohueso/gplan"
@@ -20,9 +19,9 @@ type Task struct {
 	// Duración de la tarea en días
 	Duration int
 	// Lista de tareas a las que bloquea y no se pueden empezar hasta que estuviera completada
-	BlocksTo ArrayOfTaskDependencies
+	BlocksTo []*TaskDependency
 	// Lista de tareas que bloquean a esta tarea y no podría empezarse hasta que estuvieran completadas
-	BlocksBy ArrayOfTaskDependencies
+	BlocksBy []*TaskDependency
 	// Recurso asignado
 	Resource gplan.Resource
 	// Fecha planificada de comienzo de la tarea
@@ -43,14 +42,14 @@ func NewTask(id gplan.TaskID, summary string, resourceType string, order int, du
 }
 
 // NewTaskWithBlocks crea una nueva tarea con bloqueos
-func NewTaskWithBlocks(id gplan.TaskID, summary string, resourceType string, order int, duration int, blocksTo ArrayOfTaskDependencies, blocksBy ArrayOfTaskDependencies) *Task {
+func NewTaskWithBlocks(id gplan.TaskID, summary string, resourceType string, order int, duration int, blocksTo []*TaskDependency, blocksBy []*TaskDependency) *Task {
 
 	if blocksTo == nil {
-		blocksTo = ArrayOfTaskDependencies{}
+		blocksTo = []*TaskDependency{}
 	}
 
 	if blocksBy == nil {
-		blocksBy = ArrayOfTaskDependencies{}
+		blocksBy = []*TaskDependency{}
 	}
 
 	return &Task{
@@ -84,14 +83,22 @@ func (t Task) GetDuration() int {
 	return t.Duration
 }
 
-// GetBlocksTo Getter de BlocksTo
-func (t Task) GetBlocksTo() gplan.ArrayOfTaskDependencies {
-	return t.BlocksTo
+// GetBlocksTo devuelve un nuevo array de gplan.TaskDependency
+func (t Task) GetBlocksTo() []gplan.TaskDependency {
+	newArr := make([]gplan.TaskDependency, len(t.BlocksTo))
+	for i := range t.BlocksTo {
+		newArr[i] = t.BlocksTo[i]
+	}
+	return newArr
 }
 
-// GetBlocksBy Getter de BlocksBy
-func (t Task) GetBlocksBy() gplan.ArrayOfTaskDependencies {
-	return t.BlocksBy
+// GetBlocksBy devuelve un nuevo array de gplan.TaskDependency
+func (t Task) GetBlocksBy() []gplan.TaskDependency {
+	newArr := make([]gplan.TaskDependency, len(t.BlocksBy))
+	for i := range t.BlocksBy {
+		newArr[i] = t.BlocksBy[i]
+	}
+	return newArr
 }
 
 // GetResource Getter de Resource
@@ -154,26 +161,6 @@ func (t *Task) SetRealEndDate(date time.Time) {
 	t.RealEndDate = date
 }
 
-// ArrayOfTasks implementa un gplan.ArrayOfTasks
-type ArrayOfTasks []*Task
-
-// Iterable Implementa Iterable
-func (a ArrayOfTasks) Iterable() []gplan.Task {
-	newArr := make([]gplan.Task, len(a))
-	for i := range a {
-		newArr[i] = a[i]
-	}
-	return newArr
-}
-
-// SortByOrder Implementa SortByOrder
-func (a ArrayOfTasks) SortByOrder() {
-	// Ordena las tareas por número de orden para poder planificarlas
-	sort.Slice(a, func(i, j int) bool {
-		return a[i].Order < a[j].Order
-	})
-}
-
 // BlocksTo Crea una referencia de una tarea que bloquea a otra tarea
 func BlocksTo(taskBlocks *Task, taskBloked *Task) {
 	if !hasTaskDependency(taskBloked.ID, taskBlocks.BlocksTo) {
@@ -185,9 +172,9 @@ func BlocksTo(taskBlocks *Task, taskBloked *Task) {
 }
 
 // taskIDExists Devuelve true si el ID de una tarea existe en el arrays de IDs
-func hasTaskDependency(taskID gplan.TaskID, taskDependencies ArrayOfTaskDependencies) bool {
-	for _, td := range taskDependencies.Iterable() {
-		if td.GetTaskID() == taskID {
+func hasTaskDependency(taskID gplan.TaskID, taskDependencies []*TaskDependency) bool {
+	for _, td := range taskDependencies {
+		if td.TaskID == taskID {
 			return true
 		}
 	}

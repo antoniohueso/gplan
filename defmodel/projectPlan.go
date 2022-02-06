@@ -1,6 +1,7 @@
 package defmodel
 
 import (
+	"sort"
 	"time"
 
 	"com.github.antoniohueso/gplan"
@@ -16,7 +17,7 @@ type ProjectPlan struct {
 	// Fecha planificada de fin del proyecto
 	EndDate time.Time `bson:"endDate"`
 	// Lista de tareas planificadas en el proyecto
-	Tasks ArrayOfTasks
+	Tasks []*Task
 	// Lista de recursos
 	Resources []*Resource
 	// Días de fiesta
@@ -34,7 +35,7 @@ type ProjectPlan struct {
 }
 
 // NewProjectPlan crea un nuevo plan de proyecto para poder ser planificado o revisado
-func NewProjectPlan(id gplan.ProjectPlanID, tasks ArrayOfTasks, resources []*Resource, feastDays []*Holidays) *ProjectPlan {
+func NewProjectPlan(id gplan.ProjectPlanID, tasks []*Task, resources []*Resource, feastDays []*Holidays) *ProjectPlan {
 	return &ProjectPlan{
 		ID:        id,
 		Tasks:     tasks,
@@ -68,9 +69,21 @@ func (p *ProjectPlan) SetEndDate(date time.Time) {
 	p.EndDate = date
 }
 
-// GetTasks Getter de Tasks
-func (p ProjectPlan) GetTasks() gplan.ArrayOfTasks {
-	return p.Tasks
+// GetTasks Devuelve un array de gplan.Task
+func (p ProjectPlan) GetTasks() []gplan.Task {
+	newArr := make([]gplan.Task, len(p.Tasks))
+	for i := range p.Tasks {
+		newArr[i] = p.Tasks[i]
+	}
+	return newArr
+}
+
+// SortTasksByOrder Implementa SortByOrder
+func (p ProjectPlan) SortTasksByOrder() {
+	// Ordena las tareas por número de orden para poder planificarlas
+	sort.Slice(p.Tasks, func(i, j int) bool {
+		return p.Tasks[i].Order < p.Tasks[j].Order
+	})
 }
 
 // GetResources Devuelve un nuevo array de gplan.Resources

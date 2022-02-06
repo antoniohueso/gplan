@@ -68,12 +68,6 @@ type Task interface {
 	SetRealEndDate(date time.Time)
 }
 
-// ArrayOfTasks interfaz para implementar un iterable de Task
-type ArrayOfTasks interface {
-	Iterable() []Task
-	SortByOrder()
-}
-
 // ProjectPlanID alias para el identificador de un plan de proyecto
 type ProjectPlanID string
 
@@ -88,7 +82,7 @@ type ProjectPlan interface {
 	GetEndDate() time.Time
 	SetEndDate(date time.Time)
 	// Lista de tareas planificadas en el proyecto
-	GetTasks() ArrayOfTasks
+	GetTasks() []Task
 	// Lista de recursos
 	GetResources() []Resource
 	// Días de fiesta
@@ -108,6 +102,7 @@ type ProjectPlan interface {
 	// Fecha en la que el proyecto fue archivado
 	GetArchivedDate() time.Time
 	SetArchivedDate(date time.Time)
+	SortTasksByOrder()
 }
 
 // ScheduledTaskInfo datos de la planificación de una tarea

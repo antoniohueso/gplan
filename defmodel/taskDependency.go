@@ -16,15 +16,3 @@ func NewTaskDependency(taskID gplan.TaskID) *TaskDependency {
 func (td TaskDependency) GetTaskID() gplan.TaskID {
 	return td.TaskID
 }
-
-// ArrayOfTaskDependencies implementa gplan.ArrayOfTaskDependencies
-type ArrayOfTaskDependencies []*TaskDependency
-
-// Iterable Implementa Iterable
-func (a ArrayOfTaskDependencies) Iterable() []gplan.TaskDependency {
-	newArr := make([]gplan.TaskDependency, len(a))
-	for i := range a {
-		newArr[i] = a[i]
-	}
-	return newArr
-}

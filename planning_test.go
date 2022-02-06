@@ -43,7 +43,7 @@ var _ = Describe("Planning", func() {
 		Context("Si recibe una lista de tareas vacía", func() {
 			It("Debe devolver un error", func() {
 
-				plan := defmodel.NewProjectPlan("test", defmodel.ArrayOfTasks{}, nil, nil)
+				plan := defmodel.NewProjectPlan("test", nil, nil, nil)
 
 				err := gplan.Planning(time.Now(), plan)
 				Expect(err).ShouldNot(BeNil())
@@ -54,7 +54,7 @@ var _ = Describe("Planning", func() {
 		Context("Si recibe una lista de recursos vacía", func() {
 			It("Debe devolver un error", func() {
 
-				plan := defmodel.NewProjectPlan("test", defmodel.ArrayOfTasks{{}}, nil, nil)
+				plan := defmodel.NewProjectPlan("test", []*defmodel.Task{{}}, nil, nil)
 				err := gplan.Planning(time.Now(), plan)
 				Expect(err).ShouldNot(BeNil())
 				Expect(err.Message).Should(Equal(fmt.Errorf("la lista de recursos a asignar está vacía")))
@@ -64,7 +64,7 @@ var _ = Describe("Planning", func() {
 		Context("Si hay tareas con una duración < 1", func() {
 
 			It("Debe devolver un error", func() {
-				plan := defmodel.NewProjectPlan("test", defmodel.ArrayOfTasks{
+				plan := defmodel.NewProjectPlan("test", []*defmodel.Task{
 					defmodel.NewTask("Task-2", "summary Task-2", "maquetación", 100, 1),
 					defmodel.NewTask("Task-1", "summary Task-1", "maquetación", 100, 0)},
 					[]*defmodel.Resource{{}},
@@ -83,7 +83,7 @@ var _ = Describe("Planning", func() {
 
 			It("Debe devolver un error", func() {
 
-				plan := defmodel.NewProjectPlan("test", defmodel.ArrayOfTasks{
+				plan := defmodel.NewProjectPlan("test", []*defmodel.Task{
 					defmodel.NewTask("Task-2", "summary Task-2", "maquetación", 100, 1),
 					defmodel.NewTask("Task-1", "summary Task-1", "backend", 100, 2)},
 					[]*defmodel.Resource{
