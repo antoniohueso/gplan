@@ -18,9 +18,9 @@ type ProjectPlan struct {
 	// Lista de tareas planificadas en el proyecto
 	Tasks ArrayOfTasks
 	// Lista de recursos
-	Resources ArrayOfResources
+	Resources []*Resource
 	// Días de fiesta
-	FeastDays ArrayOfHolidays
+	FeastDays []*Holidays
 	// Porcentaje real completado
 	Complete int
 	// Porcentaje completado según lo planificado
@@ -34,7 +34,7 @@ type ProjectPlan struct {
 }
 
 // NewProjectPlan crea un nuevo plan de proyecto para poder ser planificado o revisado
-func NewProjectPlan(id gplan.ProjectPlanID, tasks ArrayOfTasks, resources ArrayOfResources, feastDays ArrayOfHolidays) *ProjectPlan {
+func NewProjectPlan(id gplan.ProjectPlanID, tasks ArrayOfTasks, resources []*Resource, feastDays []*Holidays) *ProjectPlan {
 	return &ProjectPlan{
 		ID:        id,
 		Tasks:     tasks,
@@ -73,14 +73,22 @@ func (p ProjectPlan) GetTasks() gplan.ArrayOfTasks {
 	return p.Tasks
 }
 
-// GetResources Getter de Resources
-func (p ProjectPlan) GetResources() gplan.ArrayOfResources {
-	return p.Resources
+// GetResources Devuelve un nuevo array de gplan.Resources
+func (p ProjectPlan) GetResources() []gplan.Resource {
+	newArr := make([]gplan.Resource, len(p.Resources))
+	for i := range p.Resources {
+		newArr[i] = p.Resources[i]
+	}
+	return newArr
 }
 
-// GetFeastDays Getter de FeastDays
-func (p ProjectPlan) GetFeastDays() gplan.ArrayOfHolidays {
-	return p.FeastDays
+// GetFeastDays Devuelve un nuevo array de gplan.Holidays
+func (p ProjectPlan) GetFeastDays() []gplan.Holidays {
+	newArr := make([]gplan.Holidays, len(p.FeastDays))
+	for i := range p.FeastDays {
+		newArr[i] = p.FeastDays[i]
+	}
+	return newArr
 }
 
 // GetComplete Getter de Complete

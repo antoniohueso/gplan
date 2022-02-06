@@ -13,8 +13,8 @@ func Planning(startDate time.Time, projectPlan ProjectPlan) *Error {
 
 	var (
 		tasks      []Task     = projectPlan.GetTasks().Iterable()
-		resources  []Resource = projectPlan.GetResources().Iterable()
-		feastDays  []Holidays = projectPlan.GetFeastDays().Iterable()
+		resources  []Resource = projectPlan.GetResources()
+		feastDays  []Holidays = projectPlan.GetFeastDays()
 		tasksIndex map[TaskID]Task
 		err        *Error
 	)
@@ -319,7 +319,7 @@ func scheduledTask(task Task, resource Resource, feastDays []Holidays) *schedule
 	)
 
 	// concatena días de fiesta y vacaciones del recurso
-	holidaysAndFeastDays = append(holidaysAndFeastDays, resource.GetHolidays().Iterable()...)
+	holidaysAndFeastDays = append(holidaysAndFeastDays, resource.GetHolidays()...)
 	holidaysAndFeastDays = append(holidaysAndFeastDays, feastDays...)
 
 	// Si la fecha en la que debe comenzar la tarea es superior a la fecha en la que el recurso estaría disponible

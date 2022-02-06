@@ -8,11 +8,6 @@ type Holidays interface {
 	GetTo() time.Time
 }
 
-// ArrayOfHolidays interfaz para implementar un iterable de Holidays
-type ArrayOfHolidays interface {
-	Iterable() []Holidays
-}
-
 // ResourceID alias del ID único de un recurso
 type ResourceID string
 
@@ -25,15 +20,10 @@ type Resource interface {
 	// Fecha desde la que estará disponible para poder asignarle una tarea
 	GetAvailableFrom() time.Time
 	// Conjunto de días de vacaciones
-	GetHolidays() ArrayOfHolidays
+	GetHolidays() []Holidays
 	// Siguiente fecha de disponibilidad. De uso interno para calcular la siguiente fecha de disponibilidad
 	GetNextAvailableDate() time.Time
 	SetNextAvailableDate(date time.Time)
-}
-
-// ArrayOfResources interfaz para implementar un iterable de Resource
-type ArrayOfResources interface {
-	Iterable() []Resource
 }
 
 // TaskID Alias para los ID de las tareas
@@ -42,11 +32,6 @@ type TaskID string
 // TaskDependency interfaz para implementar dependencias entre las tareas de la planificación
 type TaskDependency interface {
 	GetTaskID() TaskID
-}
-
-// ArrayOfTaskDependencies interfaz para implementar un iterable de TaskDependency
-type ArrayOfTaskDependencies interface {
-	Iterable() []TaskDependency
 }
 
 // Task interfaz para implementar el acceso a la información de una tarea a planificar
@@ -60,9 +45,9 @@ type Task interface {
 	// Duración de la tarea en días
 	GetDuration() int
 	// Lista de tareas a las que bloquea y no se pueden empezar hasta que estuviera completada
-	GetBlocksTo() ArrayOfTaskDependencies
+	GetBlocksTo() []TaskDependency
 	// Lista de tareas que bloquean a esta tarea y no podría empezarse hasta que estuvieran completadas
-	GetBlocksBy() ArrayOfTaskDependencies
+	GetBlocksBy() []TaskDependency
 	// Recurso asignado
 	GetResource() Resource
 	SetResource(resource Resource)
@@ -105,9 +90,9 @@ type ProjectPlan interface {
 	// Lista de tareas planificadas en el proyecto
 	GetTasks() ArrayOfTasks
 	// Lista de recursos
-	GetResources() ArrayOfResources
+	GetResources() []Resource
 	// Días de fiesta
-	GetFeastDays() ArrayOfHolidays
+	GetFeastDays() []Holidays
 	// Porcentaje real completado
 	GetComplete() int
 	SetComplete(n int)

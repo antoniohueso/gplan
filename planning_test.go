@@ -14,22 +14,22 @@ import (
 var _ = Describe("Planning", func() {
 
 	var (
-		resources defmodel.ArrayOfResources
-		feastDays defmodel.ArrayOfHolidays
+		resources []*defmodel.Resource
+		feastDays []*defmodel.Holidays
 	)
 
 	BeforeEach(func() {
 
-		resources = defmodel.ArrayOfResources{
-			defmodel.NewResource("ahg", "Antonio Hueso", "backend", parseDate("2021-06-10"), defmodel.ArrayOfHolidays{
+		resources = []*defmodel.Resource{
+			defmodel.NewResource("ahg", "Antonio Hueso", "backend", parseDate("2021-06-10"), []*defmodel.Holidays{
 				defmodel.NewHolidays(parseDate("2021-06-17"), parseDate("2021-06-18")),
 			}),
-			defmodel.NewResource("cslopez", "Carlos Sobrino", "backend", parseDate("2021-06-07"), defmodel.ArrayOfHolidays{}),
-			defmodel.NewResource("David.Attrache", "David Attrache", "maquetacion", parseDate("2021-06-07"), defmodel.ArrayOfHolidays{}),
-			defmodel.NewResource("Noemi", "Noe Medina", "maquetacion", parseDate("2021-06-07"), defmodel.ArrayOfHolidays{}),
+			defmodel.NewResource("cslopez", "Carlos Sobrino", "backend", parseDate("2021-06-07"), nil),
+			defmodel.NewResource("David.Attrache", "David Attrache", "maquetacion", parseDate("2021-06-07"), nil),
+			defmodel.NewResource("Noemi", "Noe Medina", "maquetacion", parseDate("2021-06-07"), nil),
 		}
 
-		feastDays = defmodel.ArrayOfHolidays{
+		feastDays = []*defmodel.Holidays{
 			defmodel.NewHolidays(parseDate("2021-06-10"), parseDate("2021-06-11")),
 		}
 
@@ -43,7 +43,7 @@ var _ = Describe("Planning", func() {
 		Context("Si recibe una lista de tareas vacía", func() {
 			It("Debe devolver un error", func() {
 
-				plan := defmodel.NewProjectPlan("test", defmodel.ArrayOfTasks{}, defmodel.ArrayOfResources{}, nil)
+				plan := defmodel.NewProjectPlan("test", defmodel.ArrayOfTasks{}, nil, nil)
 
 				err := gplan.Planning(time.Now(), plan)
 				Expect(err).ShouldNot(BeNil())
@@ -54,7 +54,7 @@ var _ = Describe("Planning", func() {
 		Context("Si recibe una lista de recursos vacía", func() {
 			It("Debe devolver un error", func() {
 
-				plan := defmodel.NewProjectPlan("test", defmodel.ArrayOfTasks{{}}, defmodel.ArrayOfResources{}, nil)
+				plan := defmodel.NewProjectPlan("test", defmodel.ArrayOfTasks{{}}, nil, nil)
 				err := gplan.Planning(time.Now(), plan)
 				Expect(err).ShouldNot(BeNil())
 				Expect(err.Message).Should(Equal(fmt.Errorf("la lista de recursos a asignar está vacía")))
@@ -67,7 +67,7 @@ var _ = Describe("Planning", func() {
 				plan := defmodel.NewProjectPlan("test", defmodel.ArrayOfTasks{
 					defmodel.NewTask("Task-2", "summary Task-2", "maquetación", 100, 1),
 					defmodel.NewTask("Task-1", "summary Task-1", "maquetación", 100, 0)},
-					defmodel.ArrayOfResources{{}},
+					[]*defmodel.Resource{{}},
 					nil)
 
 				err := gplan.Planning(time.Now(), plan)
@@ -86,7 +86,7 @@ var _ = Describe("Planning", func() {
 				plan := defmodel.NewProjectPlan("test", defmodel.ArrayOfTasks{
 					defmodel.NewTask("Task-2", "summary Task-2", "maquetación", 100, 1),
 					defmodel.NewTask("Task-1", "summary Task-1", "backend", 100, 2)},
-					defmodel.ArrayOfResources{
+					[]*defmodel.Resource{
 						defmodel.NewResource("ahg", "Antonio Hueso", "backend", time.Now(), nil),
 					},
 					nil)
