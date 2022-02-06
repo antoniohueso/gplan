@@ -50,8 +50,8 @@ func (r Resource) GetAvailableFrom() time.Time {
 }
 
 // GetHolidays Devuelve un nuevo array de gplan.Holidays
-func (r Resource) GetHolidays() []gplan.IHolidays {
-	newArr := make([]gplan.IHolidays, len(r.Holidays))
+func (r Resource) GetHolidays() []gplan.Holidays {
+	newArr := make([]gplan.Holidays, len(r.Holidays))
 	for i := range r.Holidays {
 		newArr[i] = r.Holidays[i]
 	}

@@ -23,7 +23,7 @@ type Task struct {
 	// Lista de tareas que bloquean a esta tarea y no podría empezarse hasta que estuvieran completadas
 	BlocksBy []*TaskDependency
 	// Recurso asignado
-	Resource gplan.IResource
+	Resource gplan.Resource
 	// Fecha planificada de comienzo de la tarea
 	StartDate time.Time
 	// Fecha planificada de fin de la tarea
@@ -84,8 +84,8 @@ func (t Task) GetDuration() int {
 }
 
 // GetBlocksTo devuelve un nuevo array de TaskDependency
-func (t Task) GetBlocksTo() []gplan.ITaskDependency {
-	newArr := make([]gplan.ITaskDependency, len(t.BlocksTo))
+func (t Task) GetBlocksTo() []gplan.TaskDependency {
+	newArr := make([]gplan.TaskDependency, len(t.BlocksTo))
 	for i := range t.BlocksTo {
 		newArr[i] = t.BlocksTo[i]
 	}
@@ -93,8 +93,8 @@ func (t Task) GetBlocksTo() []gplan.ITaskDependency {
 }
 
 // GetBlocksBy devuelve un nuevo array de TaskDependency
-func (t Task) GetBlocksBy() []gplan.ITaskDependency {
-	newArr := make([]gplan.ITaskDependency, len(t.BlocksBy))
+func (t Task) GetBlocksBy() []gplan.TaskDependency {
+	newArr := make([]gplan.TaskDependency, len(t.BlocksBy))
 	for i := range t.BlocksBy {
 		newArr[i] = t.BlocksBy[i]
 	}
@@ -102,12 +102,12 @@ func (t Task) GetBlocksBy() []gplan.ITaskDependency {
 }
 
 // GetResource Getter de Resource
-func (t Task) GetResource() gplan.IResource {
+func (t Task) GetResource() gplan.Resource {
 	return t.Resource
 }
 
 // SetResource Setter de Resource
-func (t *Task) SetResource(resource gplan.IResource) {
+func (t *Task) SetResource(resource gplan.Resource) {
 	t.Resource = resource
 }
 

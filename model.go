@@ -2,8 +2,8 @@ package gplan
 
 import "time"
 
-// IHolidays interfaz para implementar el acceso a la información necesaria sobre rango de fechas de vacaciones o días de fiesta
-type IHolidays interface {
+// Holidays interfaz para implementar el acceso a la información necesaria sobre rango de fechas de vacaciones o días de fiesta
+type Holidays interface {
 	GetFrom() time.Time
 	GetTo() time.Time
 }
@@ -11,8 +11,8 @@ type IHolidays interface {
 // ResourceID alias del ID único de un recurso
 type ResourceID string
 
-// IResource interfaz para implementar el acceso a la información necesaria de un recurso para poder planificar una tarea
-type IResource interface {
+// Resource interfaz para implementar el acceso a la información necesaria de un recurso para poder planificar una tarea
+type Resource interface {
 	// Identificador único del recurso
 	GetID() ResourceID
 	// Clasifica el tipo de recurso, Deberá coincidir con el tipo de tarea a asignarle.
@@ -20,7 +20,7 @@ type IResource interface {
 	// Fecha desde la que estará disponible para poder asignarle una tarea
 	GetAvailableFrom() time.Time
 	// Conjunto de días de vacaciones
-	GetHolidays() []IHolidays
+	GetHolidays() []Holidays
 	// Siguiente fecha de disponibilidad. De uso interno para calcular la siguiente fecha de disponibilidad
 	GetNextAvailableDate() time.Time
 	SetNextAvailableDate(date time.Time)
@@ -29,13 +29,13 @@ type IResource interface {
 // TaskID Alias para los ID de las tareas
 type TaskID string
 
-// ITaskDependency interfaz para implementar dependencias entre las tareas de la planificación
-type ITaskDependency interface {
+// TaskDependency interfaz para implementar dependencias entre las tareas de la planificación
+type TaskDependency interface {
 	GetTaskID() TaskID
 }
 
-// ITask interfaz para implementar el acceso a la información de una tarea a planificar
-type ITask interface {
+// Task interfaz para implementar el acceso a la información de una tarea a planificar
+type Task interface {
 	// Clave por la que identificar una tarea
 	GetID() TaskID
 	// Tipo de recurso que podrá ser asignado a esta tarea
@@ -45,12 +45,12 @@ type ITask interface {
 	// Duración de la tarea en días
 	GetDuration() int
 	// Lista de tareas a las que bloquea y no se pueden empezar hasta que estuviera completada
-	GetBlocksTo() []ITaskDependency
+	GetBlocksTo() []TaskDependency
 	// Lista de tareas que bloquean a esta tarea y no podría empezarse hasta que estuvieran completadas
-	GetBlocksBy() []ITaskDependency
+	GetBlocksBy() []TaskDependency
 	// Recurso asignado
-	GetResource() IResource
-	SetResource(resource IResource)
+	GetResource() Resource
+	SetResource(resource Resource)
 	// Fecha planificada de comienzo de la tarea
 	GetStartDate() time.Time
 	SetStartDate(date time.Time)
@@ -71,8 +71,8 @@ type ITask interface {
 // ProjectPlanID alias para el identificador de un plan de proyecto
 type ProjectPlanID string
 
-// IProjectPlan interfaz para implementar el acceso a la información necesaria para poder crear o revisar una planificación
-type IProjectPlan interface {
+// ProjectPlan interfaz para implementar el acceso a la información necesaria para poder crear o revisar una planificación
+type ProjectPlan interface {
 	// Identificador del plan de proyecto
 	GetID() ProjectPlanID
 	// Fecha planificada de comienzo del proyecto
@@ -82,11 +82,11 @@ type IProjectPlan interface {
 	GetEndDate() time.Time
 	SetEndDate(date time.Time)
 	// Lista de tareas planificadas en el proyecto
-	GetTasks() []ITask
+	GetTasks() []Task
 	// Lista de recursos
-	GetResources() []IResource
+	GetResources() []Resource
 	// Días de fiesta
-	GetFeastDays() []IHolidays
+	GetFeastDays() []Holidays
 	// Porcentaje real completado
 	GetComplete() int
 	SetComplete(n int)
@@ -102,13 +102,14 @@ type IProjectPlan interface {
 	// Fecha en la que el proyecto fue archivado
 	GetArchivedDate() time.Time
 	SetArchivedDate(date time.Time)
+	// Método para ordenar las tareas por Order
 	SortTasksByOrder()
 }
 
 // ScheduledTaskInfo datos de la planificación de una tarea
 type scheduledTaskInfo struct {
 	// Recurso asignado
-	Resource IResource
+	Resource Resource
 	// Fecha planificada de comienzo de la tarea
 	StartDate time.Time
 	// Fecha planificada de fin de la tarea

@@ -70,8 +70,8 @@ func (p *ProjectPlan) SetEndDate(date time.Time) {
 }
 
 // GetTasks Devuelve un array de Task
-func (p ProjectPlan) GetTasks() []gplan.ITask {
-	newArr := make([]gplan.ITask, len(p.Tasks))
+func (p ProjectPlan) GetTasks() []gplan.Task {
+	newArr := make([]gplan.Task, len(p.Tasks))
 	for i := range p.Tasks {
 		newArr[i] = p.Tasks[i]
 	}
@@ -87,8 +87,8 @@ func (p ProjectPlan) SortTasksByOrder() {
 }
 
 // GetResources Devuelve un nuevo array de Resources
-func (p ProjectPlan) GetResources() []gplan.IResource {
-	newArr := make([]gplan.IResource, len(p.Resources))
+func (p ProjectPlan) GetResources() []gplan.Resource {
+	newArr := make([]gplan.Resource, len(p.Resources))
 	for i := range p.Resources {
 		newArr[i] = p.Resources[i]
 	}
@@ -96,8 +96,8 @@ func (p ProjectPlan) GetResources() []gplan.IResource {
 }
 
 // GetFeastDays Devuelve un nuevo array de Holidays
-func (p ProjectPlan) GetFeastDays() []gplan.IHolidays {
-	newArr := make([]gplan.IHolidays, len(p.FeastDays))
+func (p ProjectPlan) GetFeastDays() []gplan.Holidays {
+	newArr := make([]gplan.Holidays, len(p.FeastDays))
 	for i := range p.FeastDays {
 		newArr[i] = p.FeastDays[i]
 	}

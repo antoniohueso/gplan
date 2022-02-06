@@ -6,16 +6,16 @@ import (
 )
 
 // Planning Crea una nueva planificación a partir de unas tareas, recursos, vacaciones y fecha de comienzo.
-func Planning(startDate time.Time, projectPlan IProjectPlan) *Error {
+func Planning(startDate time.Time, projectPlan ProjectPlan) *Error {
 
 	// Ordena las tareas por número de orden para poder planificarlas
 	projectPlan.SortTasksByOrder()
 
 	var (
-		tasks      []ITask     = projectPlan.GetTasks()
-		resources  []IResource = projectPlan.GetResources()
-		feastDays  []IHolidays = projectPlan.GetFeastDays()
-		tasksIndex map[TaskID]ITask
+		tasks      []Task     = projectPlan.GetTasks()
+		resources  []Resource = projectPlan.GetResources()
+		feastDays  []Holidays = projectPlan.GetFeastDays()
+		tasksIndex map[TaskID]Task
 		err        *Error
 	)
 
@@ -34,7 +34,7 @@ func Planning(startDate time.Time, projectPlan IProjectPlan) *Error {
 	}
 
 	if feastDays == nil {
-		feastDays = []IHolidays{}
+		feastDays = []Holidays{}
 	}
 
 	// Planifica las tareas
@@ -65,10 +65,10 @@ func Planning(startDate time.Time, projectPlan IProjectPlan) *Error {
 }
 
 // validateTasks comprueba que las tareas tengan el formato correcto para poder realizar la planificación
-func validateTasks(aTasks []ITask, resources []IResource) (map[TaskID]ITask, *Error) {
+func validateTasks(aTasks []Task, resources []Resource) (map[TaskID]Task, *Error) {
 	var (
 		taskIDSErrors []TaskID
-		tasks         []ITask = aTasks
+		tasks         []Task = aTasks
 	)
 
 	// La lista de tareas no puede estar vacía
@@ -126,7 +126,7 @@ func validateTasks(aTasks []ITask, resources []IResource) (map[TaskID]ITask, *Er
 	}
 
 	// Crea el índice de tareas para poder saber a qué tarea corresponde un tareaID
-	var tasksIndex = make(map[TaskID]ITask, len(tasks))
+	var tasksIndex = make(map[TaskID]Task, len(tasks))
 	for _, task := range tasks {
 		tasksIndex[task.GetID()] = task
 	}
@@ -189,7 +189,7 @@ func validateTasks(aTasks []ITask, resources []IResource) (map[TaskID]ITask, *Er
 // checkForCircularDependencies Chequea que no haya referencias circulares en los bloqueos de las tareas, es decir que
 // una tarea se bloquee a sí misma.
 // Por ejemplo: A → B → C → A ...
-func checkForCircularDependencies(task ITask, tasksIndex map[TaskID]ITask, linkedblocksTo []TaskID) *Error {
+func checkForCircularDependencies(task Task, tasksIndex map[TaskID]Task, linkedblocksTo []TaskID) *Error {
 
 	for _, tID := range linkedblocksTo {
 		if tID == task.GetID() {
@@ -211,7 +211,7 @@ func checkForCircularDependencies(task ITask, tasksIndex map[TaskID]ITask, linke
 }
 
 // assignTask Asigna la tarea al recurso que en una simulación de planificación pueda acabarla antes
-func assignTask(task ITask, resources []IResource, feastDays []IHolidays, tasksIndex map[TaskID]ITask) *Error {
+func assignTask(task Task, resources []Resource, feastDays []Holidays, tasksIndex map[TaskID]Task) *Error {
 
 	var (
 		err               *Error
@@ -239,16 +239,16 @@ func assignTask(task ITask, resources []IResource, feastDays []IHolidays, tasksI
 
 // getRealStartDate Retorna la fecha real de comienzo de una tarea teniendo en cuenta que si tiene bloqueos
 // calcula la fecha mayor de las que bloquean a la tarea, ya que no se podrá empezar antes.
-func getRealStartDate(task ITask, tasksIndex map[TaskID]ITask) (time.Time, *Error) {
+func getRealStartDate(task Task, tasksIndex map[TaskID]Task) (time.Time, *Error) {
 
-	var blocksBy []ITaskDependency = task.GetBlocksBy()
+	var blocksBy []TaskDependency = task.GetBlocksBy()
 
 	// Si no tiene tareas que la bloqueen retorna la misma fecha de comienzo
 	if len(blocksBy) == 0 {
 		return task.GetStartDate(), nil
 	}
 
-	var tasksBlocksBy []ITask
+	var tasksBlocksBy []Task
 
 	// Las tareas que la bloquean en una lista de tareas ordenadas primero por las que bloquean a otros deberían
 	// estar ya planificadas, si no lo están damos error
@@ -275,10 +275,10 @@ func getRealStartDate(task ITask, tasksIndex map[TaskID]ITask) (time.Time, *Erro
 }
 
 // bestScheduledTask Calcula la planificación de la tarea para cada recurso y retorna la que termine antes.
-func bestScheduledTask(task ITask, resources []IResource, feastDays []IHolidays) *scheduledTaskInfo {
+func bestScheduledTask(task Task, resources []Resource, feastDays []Holidays) *scheduledTaskInfo {
 
 	var (
-		availableResources []IResource
+		availableResources []Resource
 		scheduledTasks     []*scheduledTaskInfo
 		bestScheduled      *scheduledTaskInfo
 	)
@@ -309,10 +309,10 @@ func bestScheduledTask(task ITask, resources []IResource, feastDays []IHolidays)
 }
 
 // scheduledTask planifica una tarea para un recurso
-func scheduledTask(task ITask, resource IResource, feastDays []IHolidays) *scheduledTaskInfo {
+func scheduledTask(task Task, resource Resource, feastDays []Holidays) *scheduledTaskInfo {
 
 	var (
-		holidaysAndFeastDays []IHolidays
+		holidaysAndFeastDays []Holidays
 		realStartDate        time.Time
 		duration             int
 		endDate              time.Time

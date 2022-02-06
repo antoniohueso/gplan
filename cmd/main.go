@@ -20,8 +20,8 @@ type ProjectPlanExt struct {
 }
 
 // GetTasks Devuelve un array de gplan.Task
-func (p ProjectPlanExt) GetTasks() []gplan.ITask {
-	newArr := make([]gplan.ITask, len(p.Tasks))
+func (p ProjectPlanExt) GetTasks() []gplan.Task {
+	newArr := make([]gplan.Task, len(p.Tasks))
 	for i := range p.Tasks {
 		newArr[i] = p.Tasks[i]
 	}
@@ -63,7 +63,7 @@ func main() {
 	prueba(plan)
 }
 
-func prueba(p gplan.IProjectPlan) {
+func prueba(p gplan.ProjectPlan) {
 
 	p.SortTasksByOrder()
 
