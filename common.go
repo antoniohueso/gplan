@@ -8,7 +8,7 @@ import (
 )
 
 // calculateLaborableDays Devuelve los días laborables que hay entre dos fechas, incluidas ambas.
-func calculateLaborableDays(from time.Time, to time.Time, holidays []Holidays) int {
+func calculateLaborableDays(from time.Time, to time.Time, holidays []IHolidays) int {
 	days := 0
 	date := from
 	for dateutil.IsLte(date, to) {
@@ -21,7 +21,7 @@ func calculateLaborableDays(from time.Time, to time.Time, holidays []Holidays) i
 }
 
 // isLaborableDay devuelve True si el día que recibe como parámetro es laborable
-func isLaborableDay(day time.Time, feastDays []Holidays) bool {
+func isLaborableDay(day time.Time, feastDays []IHolidays) bool {
 
 	// Si el día que recibimos es sábado o domingo devuelve False
 	if day.Weekday() == time.Saturday || day.Weekday() == time.Sunday {

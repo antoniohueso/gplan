@@ -1,18 +1,16 @@
-package defmodel
-
-import "com.github.antoniohueso/gplan"
+package gplan
 
 // TaskDependency Contiene información de una dependencia entre tareas
 type TaskDependency struct {
-	TaskID gplan.TaskID
+	TaskID TaskID
 }
 
 // NewTaskDependency Crea un nuevo objeto TaskDependency
-func NewTaskDependency(taskID gplan.TaskID) *TaskDependency {
+func NewTaskDependency(taskID TaskID) *TaskDependency {
 	return &TaskDependency{TaskID: taskID}
 }
 
 // GetTaskID Getter de ID
-func (td TaskDependency) GetTaskID() gplan.TaskID {
+func (td TaskDependency) GetTaskID() TaskID {
 	return td.TaskID
 }

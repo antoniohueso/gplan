@@ -1,16 +1,73 @@
 package main
 
 import (
+	"fmt"
+	"sort"
 	"time"
 
-	"com.github.antoniohueso/gplan/defmodel"
+	"com.github.antoniohueso/gplan"
 )
 
-func main() {
-	h := defmodel.NewHolidays(time.Now(), time.Now())
-	prueba(h)
+type TaskExt struct {
+	*gplan.Task
+	Status string
 }
 
-func prueba(p interface{}) {
+type ProjectPlanExt struct {
+	*gplan.ProjectPlan
+	Tasks []*TaskExt
+}
+
+// GetTasks Devuelve un array de gplan.Task
+func (p ProjectPlanExt) GetTasks() []gplan.ITask {
+	newArr := make([]gplan.ITask, len(p.Tasks))
+	for i := range p.Tasks {
+		newArr[i] = p.Tasks[i]
+	}
+	return newArr
+}
+
+// SortTasksByOrder Implementa SortByOrder
+func (p ProjectPlanExt) SortTasksByOrder() {
+	// Ordena las tareas por número de orden para poder planificarlas
+	sort.Slice(p.Tasks, func(i, j int) bool {
+		return p.Tasks[i].Order < p.Tasks[j].Order
+	})
+}
+
+func main() {
+
+	h := gplan.NewHolidays(time.Now(), time.Now())
+	h1 := gplan.NewHolidays(time.Now().AddDate(0, 1, 0), time.Now().AddDate(0, 1, 0))
+
+	r := gplan.NewResource("ahg", "Antonio Hueso", "backend", time.Now(), []*gplan.Holidays{h, h1})
+
+	var tasks []*TaskExt
+
+	for i := 0; i < 10; i++ {
+		task := &TaskExt{
+			Task:   gplan.NewTask(gplan.TaskID(fmt.Sprintf("Tarea-%d", i)), "summary sample", "backend", i, i*2),
+			Status: "Backlog",
+		}
+		tasks = append(tasks, task)
+	}
+
+	plan := &ProjectPlanExt{
+		ProjectPlan: &gplan.ProjectPlan{},
+	}
+	plan.Tasks = tasks
+	plan.Resources = []*gplan.Resource{r}
+	plan.FeastDays = []*gplan.Holidays{h}
+
+	prueba(plan)
+}
+
+func prueba(p gplan.IProjectPlan) {
+
+	p.SortTasksByOrder()
+
+	for _, t := range p.GetTasks() {
+		fmt.Printf("%s\n", t.GetID())
+	}
 
 }

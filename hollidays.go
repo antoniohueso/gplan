@@ -1,4 +1,4 @@
-package defmodel
+package gplan
 
 import (
 	"time"

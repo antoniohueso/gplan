@@ -1,15 +1,13 @@
-package defmodel
+package gplan
 
 import (
 	"time"
-
-	"com.github.antoniohueso/gplan"
 )
 
 // Resource Contiene información de un recurso
 type Resource struct {
 	// Nombre del recurso
-	ID gplan.ResourceID `json:"name"`
+	ID ResourceID `json:"name"`
 	// Descripción del recurso
 	Description string `json:"description"`
 	// Clasifica el tipo de recurso, Deberá coincidir con el tipo de tarea a asignarle.
@@ -23,7 +21,7 @@ type Resource struct {
 }
 
 // NewResource crea un nuevo recurso
-func NewResource(id gplan.ResourceID, description string, resourceType string, availableFrom time.Time, holidays []*Holidays) *Resource {
+func NewResource(id ResourceID, description string, resourceType string, availableFrom time.Time, holidays []*Holidays) *Resource {
 	return &Resource{
 		ID:                id,
 		Description:       description,
@@ -35,7 +33,7 @@ func NewResource(id gplan.ResourceID, description string, resourceType string, a
 }
 
 // GetID Getter de ID
-func (r Resource) GetID() gplan.ResourceID {
+func (r Resource) GetID() ResourceID {
 	return r.ID
 }
 
@@ -50,8 +48,8 @@ func (r Resource) GetAvailableFrom() time.Time {
 }
 
 // GetHolidays Devuelve un nuevo array de gplan.Holidays
-func (r Resource) GetHolidays() []gplan.Holidays {
-	newArr := make([]gplan.Holidays, len(r.Holidays))
+func (r Resource) GetHolidays() []IHolidays {
+	newArr := make([]IHolidays, len(r.Holidays))
 	for i := range r.Holidays {
 		newArr[i] = r.Holidays[i]
 	}
