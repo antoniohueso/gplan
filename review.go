@@ -4,7 +4,7 @@ import (
 	"math"
 	"time"
 
-	"com.github.antoniohueso/gplan/dateutil"
+	"github.com/antoniohueso/gplan/dateutil"
 )
 
 // Review actualiza el estado de avance de una planificación a fecha de reviewDate

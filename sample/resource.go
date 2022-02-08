@@ -3,7 +3,7 @@ package sample
 import (
 	"time"
 
-	"com.github.antoniohueso/gplan"
+	"github.com/antoniohueso/gplan"
 )
 
 // Resource Contiene información de un recurso

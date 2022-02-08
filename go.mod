@@ -1,4 +1,4 @@
-module com.github.antoniohueso/gplan
+module github.com/antoniohueso/gplan
 
 go 1.17
 

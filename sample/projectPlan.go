@@ -4,7 +4,7 @@ import (
 	"sort"
 	"time"
 
-	"com.github.antoniohueso/gplan"
+	"github.com/antoniohueso/gplan"
 )
 
 // ProjectPlan Contiene información de la planificación del proyecto

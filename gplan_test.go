@@ -5,8 +5,8 @@ import (
 	"log"
 	"time"
 
-	"com.github.antoniohueso/gplan"
-	. "com.github.antoniohueso/gplan/sample"
+	"github.com/antoniohueso/gplan"
+	. "github.com/antoniohueso/gplan/sample"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

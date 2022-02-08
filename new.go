@@ -24,7 +24,6 @@ func Planning(startDate time.Time, projectPlan ProjectPlan) *Error {
 		return err
 	}
 
-	// TODO: METER UN CASO DE PRUEBA QUE PRUEBE QUE EMPIEZA MÁS TARDE!!!!
 	// Si la fecha de disponibilidad ldel recurso es menor que la fecha en la que debe comenzar el proyecto sele pone la fecha en la que debe comenzar el proyecto
 	// para que no haya ninguna tarea que comeice antes
 	for _, resource := range resources {

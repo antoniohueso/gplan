@@ -3,7 +3,7 @@ package sample
 import (
 	"time"
 
-	"com.github.antoniohueso/gplan"
+	"github.com/antoniohueso/gplan"
 )
 
 // Task Contiene información de una tarea

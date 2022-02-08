@@ -1,6 +1,6 @@
 package sample
 
-import "com.github.antoniohueso/gplan"
+import "github.com/antoniohueso/gplan"
 
 // TaskDependency Contiene información de una dependencia entre tareas
 type TaskDependency struct {

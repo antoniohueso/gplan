@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"com.github.antoniohueso/gplan/dateutil"
+	"github.com/antoniohueso/gplan/dateutil"
 )
 
 // calculateLaborableDays Devuelve los días laborables que hay entre dos fechas, incluidas ambas.
