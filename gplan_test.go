@@ -11,7 +11,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("gplan.Planning", func() {
+var _ = Describe("gplan", func() {
 
 	var (
 		resources []*Resource
@@ -24,7 +24,8 @@ var _ = Describe("gplan.Planning", func() {
 			NewResource("ahg", "Antonio Hueso", "backend", parseDate("2021-06-10"), []*Holidays{
 				NewHolidays(parseDate("2021-06-17"), parseDate("2021-06-18")),
 			}),
-			NewResource("cslopez", "Carlos Sobrino", "backend", parseDate("2021-06-07"), nil),
+			// Le ponemos una fecha de disponibilidad muy inferior para comprobar que le pone la fecha de comienzo del proyecto
+			NewResource("cslopez", "Carlos Sobrino", "backend", parseDate("2021-05-07"), nil),
 			NewResource("David.Attrache", "David Attrache", "maquetacion", parseDate("2021-06-07"), nil),
 			NewResource("Noemi", "Noe Medina", "maquetacion", parseDate("2021-06-07"), nil),
 		}
@@ -35,7 +36,7 @@ var _ = Describe("gplan.Planning", func() {
 
 	})
 
-	Describe("Newgplan.Planning - Validaciones", func() {
+	Describe("New - Validaciones", func() {
 
 		println(resources)
 		println(feastDays)
@@ -196,7 +197,8 @@ var _ = Describe("gplan.Planning", func() {
 
 	})
 
-	Describe("Newgplan.Planning - Creación", func() {
+	Describe("New - Creación", func() {
+
 		Context("Creamos un plan sin dependencias con dos días de fiesta", func() {
 
 			It("El plan debe ser igual al siguiente plan", func() {
@@ -258,6 +260,201 @@ var _ = Describe("gplan.Planning", func() {
 				})
 				Expect(plan.StartDate.Format("2006-01-02")).Should(Equal("2021-06-07"))
 				Expect(plan.EndDate.Format("2006-01-02")).Should(Equal("2021-07-20"))
+			})
+		})
+
+	})
+
+	Describe("Review", func() {
+
+		var plan *ProjectPlan
+
+		BeforeEach(func() {
+			tasks := []*Task{
+				NewTask("Tarea1", "Summary", "backend", 30, 10),
+				NewTask("Tarea2", "Summary", "maquetacion", 50, 2),
+				NewTask("Tarea3", "Summary", "backend", 40, 1),
+				NewTask("Tarea4", "Summary", "maquetacion", 20, 20),
+				NewTask("Tarea5", "Summary", "backend", 60, 7),
+				NewTask("Tarea6", "Summary", "backend", 10, 9),
+			}
+
+			BlocksTo(tasks[3], tasks[0])
+			BlocksTo(tasks[5], tasks[2])
+			BlocksTo(tasks[5], tasks[1])
+
+			var err *gplan.Error
+
+			plan = NewProjectPlan("test-plan", tasks, resources, feastDays)
+			err = gplan.Planning(parseDate("2021-06-07"), plan)
+
+			Expect(err).Should(BeNil())
+
+		})
+
+		Context("Revisamos el plan el día del inicio del proyecto", func() {
+
+			It("El avance debe ser el de 0%:", func() {
+				err := gplan.Review(plan, parseDate("2021-06-07"))
+				Expect(err).Should(BeNil())
+				Expect(plan.EstimatedComplete).Should(BeZero())
+				Expect(plan.Complete).Should(BeZero())
+				Expect(plan.RealAdvancedOrDelayed).Should(BeZero())
+			})
+		})
+
+		Context("Revisión el siguiente día de comienzo de proyecto sin ningún avance en ninguna tarea", func() {
+
+			It("El avance debe ser que hay retraso:", func() {
+				err := gplan.Review(plan, parseDate("2021-06-08"))
+				Expect(err).Should(BeNil())
+				Expect(plan.EstimatedComplete).Should(Equal(4))
+				Expect(plan.Complete).Should(BeZero())
+				Expect(plan.RealAdvancedOrDelayed).Should(Equal(1.2))
+			})
+		})
+
+		Context("Revisión día 2021-06-17 con la 'tarea 1' completada", func() {
+
+			It("El avance debe ser que hay retraso:", func() {
+				plan.Tasks[2].Complete = 100
+				err := gplan.Review(plan, parseDate("2021-06-17"))
+				Expect(err).Should(BeNil())
+				Expect(plan.EstimatedComplete).Should(Equal(24))
+				Expect(plan.Complete).Should(Equal(20))
+				Expect(plan.RealAdvancedOrDelayed).Should(Equal(1.2))
+			})
+		})
+
+		Context("Revisión día 2021-07-01 con diferentes porcentajes completados", func() {
+
+			It("El avance debe ser que hay retraso:", func() {
+				plan.Tasks[0].Complete = 100
+				plan.Tasks[1].Complete = 60
+				plan.Tasks[2].Complete = 10
+				plan.Tasks[3].Complete = 100
+				plan.Tasks[4].Complete = 5
+				plan.Tasks[5].Complete = 100
+
+				err := gplan.Review(plan, parseDate("2021-07-01"))
+				Expect(err).Should(BeNil())
+				Expect(plan.EstimatedComplete).Should(Equal(69))
+				Expect(plan.Complete).Should(Equal(61))
+				Expect(plan.RealAdvancedOrDelayed).Should(Equal(2.4))
+			})
+		})
+
+		Context("Revisión día 2021-07-01 con avances significativos", func() {
+
+			It("El avance debe ser que hay adelanto:", func() {
+				plan.Tasks[0].Complete = 100
+				plan.Tasks[1].Complete = 60
+				plan.Tasks[2].Complete = 80
+				plan.Tasks[3].Complete = 100
+				plan.Tasks[4].Complete = 100
+				plan.Tasks[5].Complete = 100
+
+				err := gplan.Review(plan, parseDate("2021-07-01"))
+				Expect(err).Should(BeNil())
+				Expect(plan.EstimatedComplete).Should(Equal(69))
+				Expect(plan.Complete).Should(Equal(79))
+				Expect(plan.RealAdvancedOrDelayed).Should(Equal(-3.0))
+			})
+		})
+
+		Context("Revisión día 2021-07-01 con todo completado el 2021-07-01", func() {
+
+			It("El avance debe ser una gran adelanto:", func() {
+				for _, task := range plan.Tasks {
+					task.Complete = 100
+					task.RealEndDate = task.EndDate
+				}
+
+				plan.Tasks[1].RealEndDate = parseDate("2021-07-01")
+				plan.Tasks[2].RealEndDate = parseDate("2021-07-01")
+
+				err := gplan.Review(plan, parseDate("2021-07-01"))
+				Expect(err).Should(BeNil())
+				Expect(plan.EstimatedComplete).Should(Equal(69))
+				Expect(plan.Complete).Should(Equal(100))
+				Expect(plan.RealAdvancedOrDelayed).Should(Equal(-14.0))
+			})
+		})
+
+		Context("Revisión día 2021-07-21 con todo completado en la fecha planificada", func() {
+
+			It("El avance debe ser completado sin retraso:", func() {
+
+				for _, task := range plan.Tasks {
+					task.Complete = 100
+					task.RealEndDate = task.EndDate
+				}
+
+				err := gplan.Review(plan, parseDate("2021-07-21"))
+				Expect(err).Should(BeNil())
+				Expect(plan.EstimatedComplete).Should(Equal(100))
+				Expect(plan.Complete).Should(Equal(100))
+				Expect(plan.RealAdvancedOrDelayed).Should(Equal(0.0))
+			})
+		})
+
+		Context("Revisión día 2021-07-26 con todo completado en la fecha planificada", func() {
+
+			It("El avance debe ser ser completado sin retraso:", func() {
+
+				for _, task := range plan.Tasks {
+					task.Complete = 100
+					task.RealEndDate = task.EndDate
+				}
+
+				err := gplan.Review(plan, parseDate("2021-07-26"))
+				Expect(err).Should(BeNil())
+				Expect(plan.EstimatedComplete).Should(Equal(100))
+				Expect(plan.Complete).Should(Equal(100))
+				Expect(plan.RealAdvancedOrDelayed).Should(Equal(0.0))
+			})
+		})
+
+		Context("Revisión día 2021-07-21 on diferentes porcentajes completados", func() {
+
+			It("El avance debe ser un gran retraso:", func() {
+
+				plan.Tasks[0].Complete = 100
+				plan.Tasks[1].Complete = 60
+				plan.Tasks[2].Complete = 10
+				plan.Tasks[3].Complete = 100
+				plan.Tasks[4].Complete = 5
+				plan.Tasks[5].Complete = 100
+
+				for _, task := range plan.Tasks {
+					if task.Complete == 100 {
+						task.RealEndDate = task.EndDate
+					}
+				}
+
+				err := gplan.Review(plan, parseDate("2021-07-26"))
+				Expect(err).Should(BeNil())
+				Expect(plan.EstimatedComplete).Should(Equal(100))
+				Expect(plan.Complete).Should(Equal(61))
+				Expect(plan.RealAdvancedOrDelayed).Should(Equal(14.7))
+			})
+		})
+
+		Context("Revisión día 2021-07-30 con todo completado el día 2021-07-26:", func() {
+
+			It("El avance debe ser completado con retraso:", func() {
+
+				for _, task := range plan.Tasks {
+					task.Complete = 100
+					task.RealEndDate = task.EndDate
+				}
+				plan.Tasks[1].RealEndDate = parseDate("2021-07-26")
+
+				err := gplan.Review(plan, parseDate("2021-07-30"))
+				Expect(err).Should(BeNil())
+				Expect(plan.EstimatedComplete).Should(Equal(100))
+				Expect(plan.Complete).Should(Equal(100))
+				Expect(plan.RealAdvancedOrDelayed).Should(Equal(4.0))
 			})
 		})
 
