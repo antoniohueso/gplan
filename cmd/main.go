@@ -36,6 +36,16 @@ func (p ProjectPlanExt) SortTasksByOrder() {
 	})
 }
 
+type A struct {
+	Name string
+	Age  int
+}
+
+type B struct {
+	Name string
+	Age  int
+}
+
 func main() {
 
 	h := NewHolidays(time.Now(), time.Now())
@@ -60,7 +70,16 @@ func main() {
 	plan.Resources = []*Resource{r}
 	plan.FeastDays = []*Holidays{h}
 
-	prueba(plan)
+	//prueba(plan)
+
+	a := &A{Name: "ahg", Age: 10}
+
+	var i interface{} = a
+
+	b := i.(*B)
+
+	fmt.Printf("%s %d\n", b.Name, b.Age)
+
 }
 
 func prueba(p gplan.ProjectPlan) {
