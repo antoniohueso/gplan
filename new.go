@@ -91,6 +91,17 @@ func validateTasks(aTasks []Task, resources []Resource) (map[TaskID]Task, *Error
 		return nil, newError("las siguientes tareas tienen la duración inferior a un día", taskIDSErrors)
 	}
 
+	// No puede haber tareas con una orden menor que 1
+	for _, task := range tasks {
+		if task.GetOrder() < 1 {
+			taskIDSErrors = append(taskIDSErrors, task.GetID())
+		}
+	}
+
+	if len(taskIDSErrors) > 0 {
+		return nil, newError("las siguientes tareas tienen un orden inferior a 1", taskIDSErrors)
+	}
+
 	// Ha de haber tareas de tipo 'ResourceType' para los tipos de recurso de tipo 'Type' y viceversa
 	var (
 		typeOfTasks     = make(map[string]bool)

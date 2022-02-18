@@ -80,6 +80,24 @@ var _ = Describe("gplan", func() {
 			})
 		})
 
+		Context("Si hay tareas con un orden < 1", func() {
+
+			It("Debe devolver un error", func() {
+				plan := NewProjectPlan("test", []*Task{
+					NewTask("Task-2", "summary Task-2", "maquetación", 1, 1),
+					NewTask("Task-1", "summary Task-1", "maquetación", 0, 1)},
+					[]*Resource{{}},
+					nil)
+
+				err := gplan.Planning(time.Now(), plan)
+
+				Expect(err).ShouldNot(BeNil())
+				Expect(err.Message).Should(Equal(fmt.Errorf("las siguientes tareas tienen un orden inferior a 1")))
+				Expect(len(err.Tasks)).Should(Equal(1))
+				Expect(err.Tasks[0]).Should(BeEquivalentTo("Task-1"))
+			})
+		})
+
 		Context("Si hay tareas para tipos de recursos que no están en la lista de recursos", func() {
 
 			It("Debe devolver un error", func() {
