@@ -34,7 +34,7 @@ func Review(plan ProjectPlan, reviewDate time.Time) *Error {
 	// Si el plan está al 100% calcula la fecha de finalización real mayor para ponerla como fecha final real del proyecto
 	// Y calcular el retraso o adelanto
 	var lastResolvedDate time.Time
-	if plan.GetComplete() == 100 {
+	if plan.GetComplete() == 100 || plan.IsArchived() {
 		for _, task := range tasks {
 			if task.GetRealEndDate().After(lastResolvedDate) {
 				lastResolvedDate = task.GetRealEndDate()
