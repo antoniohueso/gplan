@@ -304,13 +304,16 @@ func bestScheduledTask(task Task, resources []Resource, feastDays []Holidays) *s
 	for _, resource := range availableResources {
 		scheduledTasks = append(scheduledTasks, scheduledTask(task, resource, feastDays))
 	}
-
-	// Ordena el resultado por la fecha de fin de menor a mayor
-	sort.Slice(scheduledTasks, func(i, j int) bool {
-		return scheduledTasks[j].EndDate.After(scheduledTasks[i].EndDate)
-	})
-
-	bestScheduled = scheduledTasks[0]
+	// Busca la mejor fecha
+	for _, sh := range scheduledTasks {
+		if bestScheduled == nil {
+			bestScheduled = sh
+		} else {
+			if sh.EndDate.Before(bestScheduled.EndDate) {
+				bestScheduled = sh
+			}
+		}
+	}
 
 	// Le pone la fecha siguiente fecha de disponibilidad al recurso asignado
 	bestScheduled.Resource.SetNextAvailableDate(bestScheduled.EndDate.AddDate(0, 0, 1))
