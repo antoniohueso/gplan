@@ -7,6 +7,34 @@ import (
 	"github.com/antoniohueso/gplan/dateutil"
 )
 
+func CalculateLaborableDate(from time.Time, days int, holidays []Holidays) time.Time {
+	return calculateLaborableDate(from, days, holidays)
+}
+
+// calculateLaborableDate devuelve una fecha laborable a partir de una fecha sumando o restando los días que recibe como parámetro.
+func calculateLaborableDate(from time.Time, days int, holidays []Holidays) time.Time {
+
+	var (
+		increment int
+		date      time.Time = from
+	)
+
+	if days < 0 {
+		increment = 1
+	} else {
+		increment = -1
+	}
+
+	for days != 0 {
+		// Si days es < 0 restará uno, si es > 0 debe sumar 1
+		date = date.AddDate(0, 0, increment*(-1))
+		if isLaborableDay(date, holidays) {
+			days += increment
+		}
+	}
+	return date
+}
+
 // calculateLaborableDays Devuelve los días laborables que hay entre dos fechas, incluidas ambas.
 func calculateLaborableDays(from time.Time, to time.Time, holidays []Holidays) int {
 	days := 0

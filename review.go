@@ -51,7 +51,13 @@ func Review(plan ProjectPlan, reviewDate time.Time) *Error {
 		lastResolvedDate,
 		feastDays)
 
+	// Calcula el avance o retraso en la planificación en días
 	plan.SetRealAdvancedOrDelayed(math.Round(estimatedAdvancedOrDelayedDays*100) / 100)
+
+	// Calcula el avance o el retraso en función de Avance o retraso en días y teniendo en cuenta los días de fiesta
+	// Redondea a la alta los días de retraso y a la baja los de adelanto de manera que si es -1.2 será -1 y si es 1.2 será 2.
+	// Es decir 1.3 días de adelanto para gplan será un día de adelanto y 1.3 días de retraso serán 2 días
+	plan.SetEstimatedEndDate(calculateLaborableDate(plan.GetEndDate(), int(math.Ceil(plan.GetRealAdvancedOrDelayed())), plan.GetFeastDays()))
 
 	return nil
 }
@@ -109,6 +115,8 @@ func calculateRealAdvance(tasks []Task) int {
 	return totalCompleteXDuration / totalDuration
 }
 
+// calculateEstimatedAdvancedOrDelayedDays Calcula la los días de retraso o adelanto que llevamos, si es positivo el valor será retraso
+// si es negativo será adelanto
 func calculateEstimatedAdvancedOrDelayedDays(
 	reviewDate time.Time,
 	shouldCompleted int,

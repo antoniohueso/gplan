@@ -32,6 +32,7 @@ var _ = Describe("gplan", func() {
 
 		feastDays = []*Holidays{
 			NewHolidays(parseDate("2021-06-10"), parseDate("2021-06-11")),
+			NewHolidays(parseDate("2021-07-21"), parseDate("2021-07-22")),
 		}
 
 	})
@@ -318,6 +319,7 @@ var _ = Describe("gplan", func() {
 				Expect(plan.EstimatedComplete).Should(BeZero())
 				Expect(plan.Complete).Should(BeZero())
 				Expect(plan.RealAdvancedOrDelayed).Should(BeZero())
+				Expect(plan.EstimatedEndDate).Should(Equal(plan.EndDate))
 			})
 		})
 
@@ -329,6 +331,7 @@ var _ = Describe("gplan", func() {
 				Expect(plan.EstimatedComplete).Should(Equal(4))
 				Expect(plan.Complete).Should(BeZero())
 				Expect(plan.RealAdvancedOrDelayed).Should(Equal(1.2))
+				Expect(plan.EstimatedEndDate).Should(Equal(parseDate("2021-07-26")))
 			})
 		})
 
@@ -341,6 +344,7 @@ var _ = Describe("gplan", func() {
 				Expect(plan.EstimatedComplete).Should(Equal(24))
 				Expect(plan.Complete).Should(Equal(20))
 				Expect(plan.RealAdvancedOrDelayed).Should(Equal(1.2))
+				Expect(plan.EstimatedEndDate).Should(Equal(parseDate("2021-07-26")))
 			})
 		})
 
@@ -359,6 +363,7 @@ var _ = Describe("gplan", func() {
 				Expect(plan.EstimatedComplete).Should(Equal(69))
 				Expect(plan.Complete).Should(Equal(61))
 				Expect(plan.RealAdvancedOrDelayed).Should(Equal(2.4))
+				Expect(plan.EstimatedEndDate).Should(Equal(parseDate("2021-07-27")))
 			})
 		})
 
@@ -377,6 +382,7 @@ var _ = Describe("gplan", func() {
 				Expect(plan.EstimatedComplete).Should(Equal(69))
 				Expect(plan.Complete).Should(Equal(79))
 				Expect(plan.RealAdvancedOrDelayed).Should(Equal(-3.0))
+				Expect(plan.EstimatedEndDate).Should(Equal(parseDate("2021-07-15")))
 			})
 		})
 
@@ -396,6 +402,7 @@ var _ = Describe("gplan", func() {
 				Expect(plan.EstimatedComplete).Should(Equal(69))
 				Expect(plan.Complete).Should(Equal(100))
 				Expect(plan.RealAdvancedOrDelayed).Should(Equal(-14.0))
+				Expect(plan.EstimatedEndDate).Should(Equal(parseDate("2021-06-30")))
 			})
 		})
 
@@ -413,6 +420,7 @@ var _ = Describe("gplan", func() {
 				Expect(plan.EstimatedComplete).Should(Equal(100))
 				Expect(plan.Complete).Should(Equal(100))
 				Expect(plan.RealAdvancedOrDelayed).Should(Equal(0.0))
+				Expect(plan.EstimatedEndDate).Should(Equal(parseDate("2021-07-20")))
 			})
 		})
 
@@ -430,6 +438,7 @@ var _ = Describe("gplan", func() {
 				Expect(plan.EstimatedComplete).Should(Equal(100))
 				Expect(plan.Complete).Should(Equal(100))
 				Expect(plan.RealAdvancedOrDelayed).Should(Equal(0.0))
+				Expect(plan.EstimatedEndDate).Should(Equal(parseDate("2021-07-20")))
 			})
 		})
 
@@ -454,7 +463,8 @@ var _ = Describe("gplan", func() {
 				Expect(err).Should(BeNil())
 				Expect(plan.EstimatedComplete).Should(Equal(100))
 				Expect(plan.Complete).Should(Equal(61))
-				Expect(plan.RealAdvancedOrDelayed).Should(Equal(14.7))
+				Expect(plan.RealAdvancedOrDelayed).Should(Equal(12.7))
+				Expect(plan.EstimatedEndDate).Should(Equal(parseDate("2021-08-10")))
 			})
 		})
 
@@ -472,7 +482,8 @@ var _ = Describe("gplan", func() {
 				Expect(err).Should(BeNil())
 				Expect(plan.EstimatedComplete).Should(Equal(100))
 				Expect(plan.Complete).Should(Equal(100))
-				Expect(plan.RealAdvancedOrDelayed).Should(Equal(4.0))
+				Expect(plan.RealAdvancedOrDelayed).Should(Equal(2.0))
+				Expect(plan.EstimatedEndDate).Should(Equal(parseDate("2021-07-26")))
 			})
 		})
 

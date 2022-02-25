@@ -96,6 +96,9 @@ type ProjectPlan interface {
 	// Avance o retraso real en días
 	GetRealAdvancedOrDelayed() float64
 	SetRealAdvancedOrDelayed(n float64)
+	// Fecha en la que realmente finalizó
+	GetEstimatedEndDate() time.Time
+	SetEstimatedEndDate(date time.Time)
 	// Si está archivado o no
 	IsArchived() bool
 	SetArchived(archived bool)

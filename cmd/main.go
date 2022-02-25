@@ -2,92 +2,22 @@ package main
 
 import (
 	"fmt"
-	"sort"
 	"time"
 
 	"github.com/antoniohueso/gplan"
-	. "github.com/antoniohueso/gplan/sample"
+	"github.com/antoniohueso/gplan/sample"
 )
-
-type TaskExt struct {
-	*Task
-	Status string
-}
-
-type ProjectPlanExt struct {
-	*ProjectPlan
-	Tasks []*TaskExt
-}
-
-// GetTasks Devuelve un array de gplan.Task
-func (p ProjectPlanExt) GetTasks() []gplan.Task {
-	newArr := make([]gplan.Task, len(p.Tasks))
-	for i := range p.Tasks {
-		newArr[i] = p.Tasks[i]
-	}
-	return newArr
-}
-
-// SortTasksByOrder Implementa SortByOrder
-func (p ProjectPlanExt) SortTasksByOrder() {
-	// Ordena las tareas por número de orden para poder planificarlas
-	sort.Slice(p.Tasks, func(i, j int) bool {
-		return p.Tasks[i].Order < p.Tasks[j].Order
-	})
-}
-
-type A struct {
-	Name string
-	Age  int
-}
-
-type B struct {
-	Name string
-	Age  int
-}
 
 func main() {
 
-	h := NewHolidays(time.Now(), time.Now())
-	h1 := NewHolidays(time.Now().AddDate(0, 1, 0), time.Now().AddDate(0, 1, 0))
-
-	r := NewResource("ahg", "Antonio Hueso", "backend", time.Now(), []*Holidays{h, h1})
-
-	var tasks []*TaskExt
-
-	for i := 0; i < 10; i++ {
-		task := &TaskExt{
-			Task:   NewTask(gplan.TaskID(fmt.Sprintf("Tarea-%d", i)), "summary sample", "backend", i, i*2),
-			Status: "Backlog",
-		}
-		tasks = append(tasks, task)
+	fecha, err := time.Parse("2006-01-02", "2021-07-20")
+	if err != nil {
+		panic(err)
 	}
 
-	plan := &ProjectPlanExt{
-		ProjectPlan: &ProjectPlan{},
-	}
-	plan.Tasks = tasks
-	plan.Resources = []*Resource{r}
-	plan.FeastDays = []*Holidays{h}
+	hfrom, _ := time.Parse("2006-01-02", "2021-07-21")
+	hto, _ := time.Parse("2006-01-02", "2021-07-22")
 
-	//prueba(plan)
-
-	a := &A{Name: "ahg", Age: 10}
-
-	var i interface{} = a
-
-	b := i.(*B)
-
-	fmt.Printf("%s %d\n", b.Name, b.Age)
-
-}
-
-func prueba(p gplan.ProjectPlan) {
-
-	p.SortTasksByOrder()
-
-	for _, t := range p.GetTasks() {
-		fmt.Printf("%s\n", t.GetID())
-	}
+	fmt.Println(gplan.CalculateLaborableDate(fecha, -2, []gplan.Holidays{sample.NewHolidays(hfrom, hto)}))
 
 }
