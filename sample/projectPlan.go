@@ -16,7 +16,7 @@ type ProjectPlan struct {
 	StartDate time.Time `bson:"startDate"`
 	// Fecha planificada de fin del proyecto
 	EndDate time.Time `bson:"endDate"`
-	// Fecha estimada de fin calculada en cada revisión en funciñon de los días de avance o retrado y los días de fiesta
+	// Fecha estimada de fin calculada en cada revisión en función de los días de avance o retraso y los días de fiesta
 	EstimatedEndDate time.Time
 	// Lista de tareas planificadas en el proyecto
 	Tasks []*Task
