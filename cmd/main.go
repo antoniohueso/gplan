@@ -20,4 +20,11 @@ func main() {
 
 	fmt.Println(gplan.CalculateLaborableDate(fecha, -2, []gplan.Holidays{sample.NewHolidays(hfrom, hto)}))
 
+	fecha, err = time.Parse("2006-01-02", "2022-03-30")
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println(gplan.CalculateLaborableDate(fecha, -2, nil))
+
 }
