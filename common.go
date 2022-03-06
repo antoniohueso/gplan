@@ -2,7 +2,6 @@ package gplan
 
 import (
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/antoniohueso/gplan/dateutil"
@@ -26,8 +25,6 @@ func calculateLaborableDate(from time.Time, days int, holidays []Holidays) time.
 		increment = -1
 	}
 
-	log.Printf("------------- Recibe fecha %s\n", date)
-
 	for days != 0 {
 		// Si days es < 0 restará uno, si es > 0 debe sumar 1
 		date = date.AddDate(0, 0, increment*(-1))
@@ -35,7 +32,6 @@ func calculateLaborableDate(from time.Time, days int, holidays []Holidays) time.
 			days += increment
 		}
 	}
-	log.Printf("------------- Sale fecha %s\n", date)
 	return date
 }
 
