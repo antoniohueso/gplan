@@ -26,7 +26,7 @@ func calculateLaborableDate(from time.Time, days int, holidays []Holidays) time.
 		increment = -1
 	}
 
-	logrus.Info("Recibe fecha %s", date)
+	logrus.Infof("Recibe fecha %s", date)
 
 	for days != 0 {
 		// Si days es < 0 restará uno, si es > 0 debe sumar 1
@@ -35,7 +35,7 @@ func calculateLaborableDate(from time.Time, days int, holidays []Holidays) time.
 			days += increment
 		}
 	}
-	logrus.Info("Sale fecha %s", date)
+	logrus.Infof("Sale fecha %s", date)
 	return date
 }
 
