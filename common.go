@@ -2,10 +2,10 @@ package gplan
 
 import (
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/antoniohueso/gplan/dateutil"
-	"github.com/sirupsen/logrus"
 )
 
 func CalculateLaborableDate(from time.Time, days int, holidays []Holidays) time.Time {
@@ -26,7 +26,7 @@ func calculateLaborableDate(from time.Time, days int, holidays []Holidays) time.
 		increment = -1
 	}
 
-	logrus.Infof("Recibe fecha %s", date)
+	log.Printf("------------- Recibe fecha %s\n", date)
 
 	for days != 0 {
 		// Si days es < 0 restará uno, si es > 0 debe sumar 1
@@ -35,7 +35,7 @@ func calculateLaborableDate(from time.Time, days int, holidays []Holidays) time.
 			days += increment
 		}
 	}
-	logrus.Infof("Sale fecha %s", date)
+	log.Printf("------------- Sale fecha %s\n", date)
 	return date
 }
 
