@@ -3,6 +3,8 @@ package gplan
 import (
 	"sort"
 	"time"
+
+	"github.com/antoniohueso/gplan/dateutil"
 )
 
 // Planning Crea una nueva planificación a partir de unas tareas, recursos, vacaciones y fecha de comienzo.
@@ -27,7 +29,7 @@ func Planning(startDate time.Time, projectPlan ProjectPlan) *Error {
 	// Si la fecha de disponibilidad ldel recurso es menor que la fecha en la que debe comenzar el proyecto sele pone la fecha en la que debe comenzar el proyecto
 	// para que no haya ninguna tarea que comeice antes
 	for _, resource := range resources {
-		if resource.GetNextAvailableDate().Before(startDate) {
+		if dateutil.IsLt(resource.GetNextAvailableDate(), startDate) {
 			resource.SetNextAvailableDate(startDate)
 		}
 	}
@@ -51,13 +53,12 @@ func Planning(startDate time.Time, projectPlan ProjectPlan) *Error {
 	// Busca la fecha de comienzo y de fin del proyecto que será la menor fecha de inicio de una tarea y la mayor
 	// fecha de fin del proyecto
 	for _, task := range tasks {
-		if task.GetStartDate().Before(projectPlan.GetStartDate()) {
+		if dateutil.IsLt(task.GetStartDate(), projectPlan.GetStartDate()) {
 			projectPlan.SetStartDate(task.GetStartDate())
 		}
-		if task.GetEndDate().After(projectPlan.GetEndDate()) {
+		if dateutil.IsGt(task.GetEndDate(), projectPlan.GetEndDate()) {
 			projectPlan.SetEndDate(task.GetEndDate())
 		}
-
 	}
 
 	return nil
@@ -276,7 +277,7 @@ func getRealStartDate(task Task, tasksIndex map[TaskID]Task) (time.Time, *Error)
 
 	// Ordena blocksBy por fecha de fin de tarea descendiente para encontrar la fecha mayor
 	sort.Slice(tasksBlocksBy, func(i, j int) bool {
-		return tasksBlocksBy[i].GetEndDate().After(tasksBlocksBy[j].GetEndDate())
+		return dateutil.IsGt(tasksBlocksBy[i].GetEndDate(), tasksBlocksBy[j].GetEndDate())
 	})
 
 	// Retorna la fecha mayor + 1 día ya que debe comenzar al día siguiente de la fecha de fin de la última tarea que la bloquean
@@ -309,7 +310,7 @@ func bestScheduledTask(task Task, resources []Resource, feastDays []Holidays) *s
 		if bestScheduled == nil {
 			bestScheduled = sh
 		} else {
-			if sh.EndDate.Before(bestScheduled.EndDate) {
+			if dateutil.IsLt(sh.EndDate, bestScheduled.EndDate) {
 				bestScheduled = sh
 			}
 		}
@@ -338,7 +339,7 @@ func scheduledTask(task Task, resource Resource, feastDays []Holidays) *schedule
 	// Si la fecha en la que debe comenzar la tarea es superior a la fecha en la que el recurso estaría disponible
 	// Ponemos esa fecha como fecha en la que el recurso estaría disponible para el cálculo y si no se pone la fecha en
 	// la que estaría disponible el recurso
-	if task.GetStartDate().After(resource.GetNextAvailableDate()) {
+	if dateutil.IsGt(task.GetStartDate(), resource.GetNextAvailableDate()) {
 		realStartDate = task.GetStartDate()
 	} else {
 		realStartDate = resource.GetNextAvailableDate()
@@ -349,7 +350,7 @@ func scheduledTask(task Task, resource Resource, feastDays []Holidays) *schedule
 
 	for {
 
-		if isLaborableDay(endDate, holidaysAndFeastDays) {
+		if IsLaborableDay(endDate, holidaysAndFeastDays) {
 			// Si es el primer día que empieza a contar actualiza la fecha de comienzo, puede que aunque la fecha de
 			// comienzo inicial sea hoy, hoy y mañana sean fiesta por lo que comenzaría dos días después
 			if duration == task.GetDuration() {

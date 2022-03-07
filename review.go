@@ -36,7 +36,7 @@ func Review(plan ProjectPlan, reviewDate time.Time) *Error {
 	var lastResolvedDate time.Time
 	if plan.GetComplete() == 100 || plan.IsArchived() {
 		for _, task := range tasks {
-			if task.GetRealEndDate().After(lastResolvedDate) {
+			if dateutil.IsGt(task.GetRealEndDate(), lastResolvedDate) {
 				lastResolvedDate = task.GetRealEndDate()
 			}
 		}
@@ -57,7 +57,7 @@ func Review(plan ProjectPlan, reviewDate time.Time) *Error {
 	// Calcula el avance o el retraso en función de Avance o retraso en días y teniendo en cuenta los días de fiesta
 	// Redondea a la alta los días de retraso y a la baja los de adelanto de manera que si es -1.2 será -1 y si es 1.2 será 2.
 	// Es decir 1.3 días de adelanto para gplan será un día de adelanto y 1.3 días de retraso serán 2 días
-	plan.SetEstimatedEndDate(calculateLaborableDate(plan.GetEndDate(), int(math.Ceil(plan.GetRealAdvancedOrDelayed())), plan.GetFeastDays()))
+	plan.SetEstimatedEndDate(CalculateLaborableDate(plan.GetEndDate(), int(math.Ceil(plan.GetRealAdvancedOrDelayed())), plan.GetFeastDays()))
 
 	return nil
 }
@@ -82,10 +82,10 @@ func calculateEstimatedAdvance(tasks []Task, feastDays []Holidays, currDate time
 			holidaysAndFeastDays = append(holidaysAndFeastDays, task.GetResource().GetHolidays()...)
 			holidaysAndFeastDays = append(holidaysAndFeastDays, feastDays...)
 
-			currDays := calculateLaborableDays(task.GetStartDate(), currDate.AddDate(0, 0, -1), holidaysAndFeastDays)
+			currDays := CalculateLaborableDays(task.GetStartDate(), currDate.AddDate(0, 0, -1), holidaysAndFeastDays)
 			estimatedAdvanced += currDays
 			task.SetEstimatedComplete((currDays * 100) / task.GetDuration())
-		} else if currDate.After(task.GetEndDate()) {
+		} else if dateutil.IsGt(currDate, task.GetEndDate()) {
 			// Se ha pasado de la fecha fin, debería estar al 100%
 			task.SetEstimatedComplete(100)
 			estimatedAdvanced += task.GetDuration()
@@ -132,22 +132,22 @@ func calculateEstimatedAdvancedOrDelayedDays(
 	if realCompleted == 100 {
 
 		// Si la fecha en de la última resolución es > que la fecha de fin de planificación
-		if lastResolvedDate.After(endDate) {
+		if dateutil.IsGt(lastResolvedDate, endDate) {
 			// Calcula los días que van desde la fecha final + 1 y la fecha de resolución y serán días de retraso
-			result = float64(calculateLaborableDays(endDate.AddDate(0, 0, 1), lastResolvedDate, feastDays))
-		} else if lastResolvedDate.Equal(endDate) {
+			result = float64(CalculateLaborableDays(endDate.AddDate(0, 0, 1), lastResolvedDate, feastDays))
+		} else if dateutil.IsEqual(lastResolvedDate, endDate) {
 			// Si la última fecha de resolución coincide con la fecha de fin de proyecto no hay retraso ni adelanto
 			result = 0.0
 		} else {
 			// Calcula los días que van desde la fecha de resolución de la última tarea gasta la fecha final
 			// y serán días de adelanto (por eso se multiplica por -1)
-			result = float64(calculateLaborableDays(lastResolvedDate, endDate, feastDays)) * -1
+			result = float64(CalculateLaborableDays(lastResolvedDate, endDate, feastDays)) * -1
 		}
 
 	} else {
 		// Si no está completado ni debería estarlo
 		// Se calculan los días de adelanto o de retraso normalmente
-		days := float64(calculateLaborableDays(startDate, endDate, feastDays))
+		days := float64(CalculateLaborableDays(startDate, endDate, feastDays))
 		diff := float64(shouldCompleted - realCompleted)
 		result = (diff * days) / 100.0
 
@@ -155,7 +155,7 @@ func calculateEstimatedAdvancedOrDelayedDays(
 			// Si no se ha completado, pero debería estar ya al 100%
 			// Calcula como días de retraso los que van desde la fecha de fin + 1 y la fecha de hoy - 1, ya que no se debe
 			// tener en cuenta la fecha actual en el seguimiento
-			result2 := float64(calculateLaborableDays(endDate.AddDate(0, 0, 1), reviewDate.AddDate(0, 0, -1), feastDays))
+			result2 := float64(CalculateLaborableDays(endDate.AddDate(0, 0, 1), reviewDate.AddDate(0, 0, -1), feastDays))
 			// se los suma a los anteriores
 			result += result2
 		}

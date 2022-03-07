@@ -3,28 +3,55 @@ package main
 import (
 	"fmt"
 	"time"
-
-	"github.com/antoniohueso/gplan"
-	"github.com/antoniohueso/gplan/sample"
 )
 
 func main() {
 
-	fecha, err := time.Parse("2006-01-02", "2021-07-20")
-	if err != nil {
-		panic(err)
-	}
+	fechaUTC := time.Date(2022, 3, 6, 23, 30, 0, 0, time.UTC)
+	fechaLocal := fechaUTC.Local().Add(2 * time.Hour)
 
-	hfrom, _ := time.Parse("2006-01-02", "2021-07-21")
-	hto, _ := time.Parse("2006-01-02", "2021-07-22")
+	fmt.Printf("%s\n", fechaUTC)
+	fmt.Println(fechaUTC.Year())
+	fmt.Println(fechaUTC.Month())
+	fmt.Println(fechaUTC.Day())
+	fmt.Println(fechaUTC.Weekday())
 
-	fmt.Println(gplan.CalculateLaborableDate(fecha, -2, []gplan.Holidays{sample.NewHolidays(hfrom, hto)}))
+	fmt.Printf("%s\n", fechaLocal)
 
-	fecha, err = time.Parse("2006-01-02", "2022-03-29")
-	if err != nil {
-		panic(err)
-	}
+	fmt.Println(fechaLocal.Year())
+	fmt.Println(fechaLocal.Month())
+	fmt.Println(fechaLocal.Day())
+	fmt.Println(fechaLocal.Weekday())
 
-	fmt.Println(gplan.CalculateLaborableDate(fecha, -2, nil))
+	fmt.Println(fechaUTC.Local())
+	fmt.Println(fechaLocal.Local())
 
+	f(fechaUTC)
+	f(fechaLocal)
+
+	fmt.Println("POLLAS", fechaUTC.Local())
+	fmt.Println("POLLAS", fechaLocal.Local())
+
+	d1 := time.Date(fechaUTC.Local().Year(), fechaUTC.Local().Month(), fechaUTC.Local().Day(), 0, 0, 0, 0, time.UTC)
+	d2 := time.Date(fechaLocal.Local().Year(), fechaUTC.Local().Month(), fechaUTC.Local().Day(), 0, 0, 0, 0, time.UTC)
+
+	fmt.Println(d1.Equal(d2))
+
+	/*
+		fecha := time.Date(2022, 3, 29, 23, 0, 0, 0, time.UTC)
+
+		fmt.Println(fecha.Local())
+
+		res := gplan.CalculateLaborableDate(fecha, -2, nil)
+
+		fmt.Println(res.Weekday())
+
+		fmt.Println(res.Local())
+		fmt.Println(res)
+	*/
+}
+
+func f(fe time.Time) {
+	fe = time.Date(fe.Local().Year(), fe.Local().Month(), fe.Local().Day(), 0, 0, 0, 0, time.Local)
+	fmt.Println(fe)
 }
