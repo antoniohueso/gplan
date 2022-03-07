@@ -2,7 +2,7 @@ package dateutil
 
 import "time"
 
-// IsEqual devuelve True si la fecha que recibe como parámero dayA es igual que dayB
+// IsEqual devuelve True si la fecha que recibe como parámetro dayA es igual que dayB
 func IsEqual(dayA time.Time, dayB time.Time) bool {
 	dayA = toLocalDate(dayA)
 	dayB = toLocalDate(dayB)
@@ -10,7 +10,7 @@ func IsEqual(dayA time.Time, dayB time.Time) bool {
 	return dayA.Equal(dayB)
 }
 
-// IsLt devuelve True si la fecha que recibe como parámero dayA es menor que dayB
+// IsLt devuelve True si la fecha que recibe como parámetro dayA es menor que dayB
 func IsLt(dayA time.Time, dayB time.Time) bool {
 	dayA = toLocalDate(dayA)
 	dayB = toLocalDate(dayB)
@@ -18,7 +18,7 @@ func IsLt(dayA time.Time, dayB time.Time) bool {
 	return dayA.Before(dayB)
 }
 
-// IsLte devuelve True si la fecha que recibe como parámero dayA es menor o igual que dayB
+// IsLte devuelve True si la fecha que recibe como parámetro dayA es menor o igual que dayB
 func IsLte(dayA time.Time, dayB time.Time) bool {
 	dayA = toLocalDate(dayA)
 	dayB = toLocalDate(dayB)
@@ -26,7 +26,7 @@ func IsLte(dayA time.Time, dayB time.Time) bool {
 	return dayA.Before(dayB) || dayA.Equal(dayB)
 }
 
-// IsGt devuelve True si la fecha que recibe como parámero dayA es mayor que dayB
+// IsGt devuelve True si la fecha que recibe como parámetro dayA es mayor que dayB
 func IsGt(dayA time.Time, dayB time.Time) bool {
 	dayA = toLocalDate(dayA)
 	dayB = toLocalDate(dayB)
@@ -34,7 +34,7 @@ func IsGt(dayA time.Time, dayB time.Time) bool {
 	return dayA.After(dayB)
 }
 
-// IsGte devuelve True si la fecha que recibe como parámero dayA es mayor o igual que dayB
+// IsGte devuelve True si la fecha que recibe como parámetro dayA es mayor o igual que dayB
 func IsGte(dayA time.Time, dayB time.Time) bool {
 	dayA = toLocalDate(dayA)
 	dayB = toLocalDate(dayB)
@@ -42,7 +42,7 @@ func IsGte(dayA time.Time, dayB time.Time) bool {
 	return dayA.After(dayB) || dayA.Equal(dayB)
 }
 
-// IsBetween devuelve True si la fecha que recibe como parámero day es mayor o igual que from y menor o igual que to
+// IsBetween devuelve True si la fecha que recibe como parámetro day es mayor o igual que from y menor o igual que to
 func IsBetween(day time.Time, from time.Time, to time.Time) bool {
 	day = toLocalDate(day)
 	from = toLocalDate(from)

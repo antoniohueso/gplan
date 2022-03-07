@@ -148,8 +148,18 @@ func calculateEstimatedAdvancedOrDelayedDays(
 		// Si no está completado ni debería estarlo
 		// Se calculan los días de adelanto o de retraso normalmente
 		days := float64(CalculateLaborableDays(startDate, endDate, feastDays))
-		diff := float64(shouldCompleted - realCompleted)
-		result = (diff * days) / 100.0
+
+		// Calcula los días que deberían estar completados según el % avance estimado
+		daysShouldCompleted := (float64(shouldCompleted) * days) / 100.0
+		// Calcula los días que deberían estar completados según el % avance real
+		daysRealCompleted := (float64(realCompleted) * days) / 100.0
+		// resta los días estimados que deberían estar completados - los días completados reales
+		// Si el importe es positivo, son días de atraso y si el importe es 0 no hay retraso ni adelanto, vamos al día.
+		result = daysShouldCompleted - daysRealCompleted
+
+		// Forma anterior de calcularlo me gusta más la anterior, es más intuitiva
+		//diff := float64(shouldCompleted - realCompleted)
+		//result = (diff * days) / 100.0
 
 		if shouldCompleted == 100 {
 			// Si no se ha completado, pero debería estar ya al 100%
