@@ -76,5 +76,5 @@ func newError(message string, tasks []TaskID, params ...interface{}) *Error {
 }
 
 func Version() string {
-	return "1.1"
+	return "1.1.1"
 }
