@@ -99,6 +99,9 @@ type ProjectPlan interface {
 	// Fecha en la que realmente finalizó
 	GetEstimatedEndDate() time.Time
 	SetEstimatedEndDate(date time.Time)
+	// Duración total del proyecto
+	GetTotalDuration() int
+	SetTotalDuration(n int)
 	// Si está archivado o no
 	IsArchived() bool
 	SetArchived(archived bool)

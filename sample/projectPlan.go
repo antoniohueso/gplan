@@ -18,6 +18,8 @@ type ProjectPlan struct {
 	EndDate time.Time `bson:"endDate"`
 	// Fecha estimada de fin calculada en cada revisión en función de los días de avance o retraso y los días de fiesta
 	EstimatedEndDate time.Time
+	// Duración total del proyecto
+	TotalDuration int
 	// Lista de tareas planificadas en el proyecto
 	Tasks []*Task
 	// Lista de recursos
@@ -79,6 +81,16 @@ func (p ProjectPlan) GetEstimatedEndDate() time.Time {
 // SetEndDate Setter de EstimatedEndDate
 func (p *ProjectPlan) SetEstimatedEndDate(date time.Time) {
 	p.EstimatedEndDate = date
+}
+
+// GetTotalDuration Getter de TotalDuration
+func (p ProjectPlan) GetTotalDuration() int {
+	return p.TotalDuration
+}
+
+// SetTotalDuration Setter de TotalDuration
+func (p *ProjectPlan) SetTotalDuration(n int) {
+	p.TotalDuration = n
 }
 
 // GetTasks Devuelve un array de Task
