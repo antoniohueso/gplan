@@ -10,6 +10,8 @@ import (
 // CalculateLaborableDate devuelve una fecha laborable a partir de una fecha sumando o restando los días que recibe como parámetro.
 func CalculateLaborableDate(from time.Time, days int, holidays []Holidays) time.Time {
 
+	from = from.Local()
+
 	var (
 		increment int
 		date      time.Time = from
