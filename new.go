@@ -61,7 +61,7 @@ func Planning(startDate time.Time, projectPlan ProjectPlan) *Error {
 		}
 	}
 
-	projectPlan.SetWorkdays(CalculateLaborableDays(projectPlan.GetStartDate(), projectPlan.GetEndDate(), projectPlan.GetFeastDays()))
+	projectPlan.SetWorkDays(CalculateLaborableDays(projectPlan.GetStartDate(), projectPlan.GetEndDate(), projectPlan.GetFeastDays()))
 
 	return nil
 }
