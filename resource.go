@@ -5,14 +5,15 @@ import (
 )
 
 type IResource interface {
-	GetResource() *Resource
+	Base() *ResourceBase
+	GetHolidays() []IHolidays
 }
 
 // ResourceID alias del ID único de un recurso
 type ResourceID string
 
-// Resource Contiene información de un recurso
-type Resource struct {
+// ResourceBase Contiene información de un recurso
+type ResourceBase struct {
 	// Nombre del recurso
 	ID ResourceID `json:"name"`
 	// Descripción del recurso
@@ -21,30 +22,18 @@ type Resource struct {
 	Type string `json:"type"`
 	// Fecha desde la que estará disponible para poder asignarle una tarea
 	AvailableFrom time.Time `json:"availableFrom"`
-	// Conjunto de días de vacaciones
-	Holidays []IHolidays `json:"holidays"`
 	// Siguiente fecha de disponibilidad. De uso interno para calcular la siguiente fecha de disponibilidad
 	nextAvailableDate time.Time
 }
 
 // NewResource crea un nuevo recurso
-func NewResource(id ResourceID, description string, resourceType string, availableFrom time.Time, holidays []IHolidays) *Resource {
+func NewResourceBase(id ResourceID, description string, resourceType string, availableFrom time.Time) *ResourceBase {
 
-	if holidays == nil {
-		holidays = []IHolidays{}
-	}
-
-	return &Resource{
+	return &ResourceBase{
 		ID:                id,
 		Description:       description,
 		Type:              resourceType,
 		AvailableFrom:     availableFrom,
 		nextAvailableDate: availableFrom,
-		Holidays:          holidays,
 	}
-}
-
-// GetResource() implementa IResource
-func (s *Resource) GetResource() *Resource {
-	return s
 }

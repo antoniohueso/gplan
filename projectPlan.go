@@ -5,27 +5,25 @@ import (
 )
 
 type IProjectPlan interface {
-	GetProjectPlan() *ProjectPlan
+	Base() *ProjectPlanBase
+	GetTasks() []ITask
+	GetResources() []IResource
+	GetFeastDays() []IHolidays
+	SortTasksByOrder()
 }
 
 // ProjectPlanID alias para el identificador de un plan de proyecto
 type ProjectPlanID string
 
-// ProjectPlan Contiene información de la planificación del proyecto
+// ProjectPlanBase Contiene información de la planificación del proyecto
 // Solo pongo etiquetas bson a aquellas por las que voy a buscar o de lo contrario no funciona
-type ProjectPlan struct {
+type ProjectPlanBase struct {
 	// Identificador del plan de proyecto
 	ID ProjectPlanID `json:"id" bson:"_id"`
 	// Fecha planificada de comienzo del proyecto
 	StartDate time.Time `json:"startDate"`
 	// Fecha planificada de fin del proyecto
 	EndDate time.Time `json:"endDate"`
-	// Lista de tareas planificadas en el proyecto
-	Tasks []ITask `json:"tasks"`
-	// Lista de recursos
-	Resources []IResource `json:"resources"`
-	// Días de fiesta
-	FeastDays []IHolidays `json:"feastDays"`
 	// Porcentaje real completado
 	RealProgress uint `json:"realProgress"`
 	// Porcentaje completado según lo planificado
@@ -46,27 +44,8 @@ type ProjectPlan struct {
 }
 
 // NewProjectPlan crea un nuevo plan de proyecto para poder ser planificado o revisado
-func NewProjectPlan(id ProjectPlanID, tasks []ITask, resources []IResource, feastDays []IHolidays) *ProjectPlan {
-
-	var completeTasks uint
-
-	for _, t := range tasks {
-		if t.GetTask().RealProgress == 100 {
-			completeTasks++
-		}
+func NewProjectPlan(id ProjectPlanID) *ProjectPlanBase {
+	return &ProjectPlanBase{
+		ID: id,
 	}
-
-	return &ProjectPlan{
-		ID:            id,
-		Tasks:         tasks,
-		Resources:     resources,
-		FeastDays:     feastDays,
-		TotalTasks:    uint(len(tasks)),
-		CompleteTasks: completeTasks,
-	}
-}
-
-// Implementa IProjectPlan
-func (s *ProjectPlan) GetProjectPlan() *ProjectPlan {
-	return s
 }

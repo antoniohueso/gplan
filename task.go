@@ -8,11 +8,15 @@ import (
 type TaskID string
 
 type ITask interface {
-	GetTask() *Task
+	Base() *TaskBase
+	GetResource() IResource
+	SetResource(resource IResource)
+	GetBlocksTo() []ITaskDependency
+	GetBlocksBy() []ITaskDependency
 }
 
-// Task Contiene información de una tarea
-type Task struct {
+// TaskBase Contiene información de una tarea
+type TaskBase struct {
 	// Clave por la que identificar una tarea
 	ID TaskID `json:"id"`
 	// Descripción de la tarea
@@ -23,12 +27,6 @@ type Task struct {
 	Order int `json:"order"`
 	// Duración de la tarea en días
 	Duration uint `json:"duration"`
-	// Lista de tareas a las que bloquea y no se pueden empezar hasta que estuviera completada
-	BlocksTo []ITaskDependency `json:"blocksTo"`
-	// Lista de tareas que bloquean a esta tarea y no podría empezarse hasta que estuvieran completadas
-	BlocksBy []ITaskDependency `json:"blocksBy"`
-	// Recurso asignado - No se almacena en BD
-	Resource IResource `json:"resource" bson:",omitempty"`
 	// Fecha planificada de comienzo de la tarea
 	StartDate time.Time `json:"startDate"`
 	// Fecha planificada de fin de la tarea
@@ -41,40 +39,20 @@ type Task struct {
 	RealEndDate time.Time `json:"realEndDate"`
 }
 
-// NewTask crea una nueva tarea sin bloqueos
-func NewTask(id TaskID, issueID uint64, summary string, resourceType string, order int, duration uint) *Task {
-	return NewTaskWithBlocks(id, issueID, summary, resourceType, order, duration, nil, nil)
-}
-
-// NewTaskWithBlocks crea una nueva tarea con bloqueos
-func NewTaskWithBlocks(id TaskID, issueID uint64, summary string, resourceType string, order int, duration uint, blocksTo []ITaskDependency, blocksBy []ITaskDependency) *Task {
-
-	if blocksTo == nil {
-		blocksTo = []ITaskDependency{}
-	}
-
-	if blocksBy == nil {
-		blocksBy = []ITaskDependency{}
-	}
-
-	return &Task{
+// NewTaskBase crea una nueva tarea
+func NewTaskBase(id TaskID, summary string, resourceType string, order int, duration uint) *TaskBase {
+	return &TaskBase{
 		ID:           id,
 		Summary:      summary,
 		ResourceType: resourceType,
 		Order:        order,
 		Duration:     duration,
-		BlocksTo:     blocksTo,
-		BlocksBy:     blocksBy,
 	}
 }
 
-// GetTask implementa ITask
-func (s *Task) GetTask() *Task {
-	return s
-}
-
+/*
 // BlocksTo Crea una referencia de una tarea que bloquea a otra tarea
-func BlocksTo(taskBlocks *Task, taskBloked *Task) {
+func BlocksTo(taskBlocks *TaskBase, taskBloked *TaskBase) {
 	if !hasTaskDependency(taskBloked.ID, taskBlocks.BlocksTo) {
 		taskBlocks.BlocksTo = append(taskBlocks.BlocksTo, NewTaskDependency(taskBloked.ID))
 	}
@@ -92,3 +70,4 @@ func hasTaskDependency(taskID TaskID, taskDependencies []ITaskDependency) bool {
 	}
 	return false
 }
+*/

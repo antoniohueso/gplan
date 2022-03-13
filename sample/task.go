@@ -1,39 +1,48 @@
 package sample
 
 import (
-	"time"
-
 	"github.com/antoniohueso/gplan"
 )
 
 // Task Contiene información de una tarea
 type Task struct {
-	// Clave por la que identificar una tarea
-	ID gplan.TaskID
-	// Descripción de la tarea
-	Summary string
-	// Tipo de recurso que podrá ser asignado a esta tarea
-	ResourceType string
-	// Número de orden de la tarea dentro de la lista de tareas
-	Order int
-	// Duración de la tarea en días
-	Duration uint
+	*gplan.TaskBase
+	// Recurso asignado - No se almacena en BD
+	Resource *Resource `json:"resource" bson:",omitempty"`
 	// Lista de tareas a las que bloquea y no se pueden empezar hasta que estuviera completada
 	BlocksTo []*TaskDependency
 	// Lista de tareas que bloquean a esta tarea y no podría empezarse hasta que estuvieran completadas
 	BlocksBy []*TaskDependency
-	// Recurso asignado
-	Resource gplan.Resource
-	// Fecha planificada de comienzo de la tarea
-	StartDate time.Time
-	// Fecha planificada de fin de la tarea
-	EndDate time.Time
-	// Porcentaje real completado
-	RealProgress uint
-	// Porcentaje completado según lo planificado
-	ExpectedProgress uint
-	// Fecha real de finalización
-	RealEndDate time.Time
+}
+
+func (s *Task) Base() *gplan.TaskBase {
+	return s.TaskBase
+}
+
+func (s *Task) GetResource() gplan.IResource {
+	return s.Resource
+}
+
+func (s *Task) SetResource(resource gplan.IResource) {
+	s.Resource = resource.(*Resource)
+}
+
+// GetBlocksTo devuelve un nuevo array de TaskDependency
+func (s *Task) GetBlocksTo() []gplan.ITaskDependency {
+	newArr := make([]gplan.ITaskDependency, len(s.BlocksTo))
+	for i := range s.BlocksTo {
+		newArr[i] = s.BlocksTo[i]
+	}
+	return newArr
+}
+
+// GetBlocksBy devuelve un nuevo array de TaskDependency
+func (s *Task) GetBlocksBy() []gplan.ITaskDependency {
+	newArr := make([]gplan.ITaskDependency, len(s.BlocksBy))
+	for i := range s.BlocksBy {
+		newArr[i] = s.BlocksBy[i]
+	}
+	return newArr
 }
 
 // NewTask crea una nueva tarea sin bloqueos
@@ -53,121 +62,19 @@ func NewTaskWithBlocks(id gplan.TaskID, summary string, resourceType string, ord
 	}
 
 	return &Task{
-		ID:           id,
-		Summary:      summary,
-		ResourceType: resourceType,
-		Order:        order,
-		Duration:     duration,
-		BlocksTo:     blocksTo,
-		BlocksBy:     blocksBy,
+		TaskBase: gplan.NewTaskBase(id, summary, resourceType, order, duration),
+		BlocksTo: blocksTo,
+		BlocksBy: blocksBy,
 	}
-}
-
-// GetID Getter de ID
-func (t Task) GetID() gplan.TaskID {
-	return t.ID
-}
-
-// GetResourceType Getter de ResourceType
-func (t Task) GetResourceType() string {
-	return t.ResourceType
-}
-
-// GetOrder Getter de Order
-func (t Task) GetOrder() int {
-	return t.Order
-}
-
-// GetDuration Getter de Duration
-func (t Task) GetDuration() uint {
-	return t.Duration
-}
-
-// GetBlocksTo devuelve un nuevo array de TaskDependency
-func (t Task) GetBlocksTo() []gplan.TaskDependency {
-	newArr := make([]gplan.TaskDependency, len(t.BlocksTo))
-	for i := range t.BlocksTo {
-		newArr[i] = t.BlocksTo[i]
-	}
-	return newArr
-}
-
-// GetBlocksBy devuelve un nuevo array de TaskDependency
-func (t Task) GetBlocksBy() []gplan.TaskDependency {
-	newArr := make([]gplan.TaskDependency, len(t.BlocksBy))
-	for i := range t.BlocksBy {
-		newArr[i] = t.BlocksBy[i]
-	}
-	return newArr
-}
-
-// GetResource Getter de Resource
-func (t Task) GetResource() gplan.Resource {
-	return t.Resource
-}
-
-// SetResource Setter de Resource
-func (t *Task) SetResource(resource gplan.Resource) {
-	t.Resource = resource
-}
-
-// GetStartDate Getter de StartDate
-func (t Task) GetStartDate() time.Time {
-	return t.StartDate
-}
-
-// SetStartDate Setter de StartDate
-func (t *Task) SetStartDate(date time.Time) {
-	t.StartDate = date
-}
-
-// GetEndDate Getter de EndDate
-func (t Task) GetEndDate() time.Time {
-	return t.EndDate
-}
-
-// SetEndDate Setter de EndDate
-func (t *Task) SetEndDate(date time.Time) {
-	t.EndDate = date
-}
-
-// GetComplete Getter de Complete
-func (t Task) GetRealProgress() uint {
-	return t.RealProgress
-}
-
-// SetComplete Setter de Complete
-func (t *Task) SetRealProgress(n uint) {
-	t.RealProgress = n
-}
-
-// GetEstimatedComplete Getter de EstimatedComplete
-func (t Task) GetExpectedProgress() uint {
-	return t.ExpectedProgress
-}
-
-// SetEstimatedComplete Setter de EstimatedComplete
-func (t *Task) SetExpectedProgress(n uint) {
-	t.ExpectedProgress = n
-}
-
-// GetRealEndDate Getter de RealEndDate
-func (t Task) GetRealEndDate() time.Time {
-	return t.RealEndDate
-}
-
-// SetRealEndDate Setter de RealEndDate
-func (t *Task) SetRealEndDate(date time.Time) {
-	t.RealEndDate = date
 }
 
 // BlocksTo Crea una referencia de una tarea que bloquea a otra tarea
 func BlocksTo(taskBlocks *Task, taskBloked *Task) {
 	if !hasTaskDependency(taskBloked.ID, taskBlocks.BlocksTo) {
-		taskBlocks.BlocksTo = append(taskBlocks.BlocksTo, NewTaskDependency(taskBloked.ID))
+		taskBlocks.BlocksTo = append(taskBlocks.BlocksTo, NewTaskDependency(taskBloked.ID, taskBloked.Summary, "KeyURL"))
 	}
 	if !hasTaskDependency(taskBlocks.ID, taskBloked.BlocksBy) {
-		taskBloked.BlocksBy = append(taskBloked.BlocksBy, NewTaskDependency(taskBlocks.ID))
+		taskBloked.BlocksBy = append(taskBloked.BlocksBy, NewTaskDependency(taskBlocks.ID, taskBlocks.Summary, "KeyURL"))
 	}
 }
 

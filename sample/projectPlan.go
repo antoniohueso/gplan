@@ -2,7 +2,6 @@ package sample
 
 import (
 	"sort"
-	"time"
 
 	"github.com/antoniohueso/gplan"
 )
@@ -10,170 +9,62 @@ import (
 // ProjectPlan Contiene información de la planificación del proyecto
 // Solo pongo etiquetas bson a aquellas por las que voy a buscar o de lo contrario no funciona
 type ProjectPlan struct {
-	// Identificador del plan de proyecto
-	ID gplan.ProjectPlanID `bson:"_id"`
-	// Fecha planificada de comienzo del proyecto
-	StartDate time.Time `bson:"startDate"`
-	// Fecha planificada de fin del proyecto
-	EndDate time.Time `bson:"endDate"`
-	// Fecha estimada de fin calculada en cada revisión en función de los días de avance o retraso y los días de fiesta
-	EstimatedEndDate time.Time
-	// Total jornadas de trabajo del proyecto
-	Workdays uint
+	*gplan.ProjectPlanBase
 	// Lista de tareas planificadas en el proyecto
 	Tasks []*Task
 	// Lista de recursos
 	Resources []*Resource
 	// Días de fiesta
 	FeastDays []*Holidays
-	// Porcentaje real completado
-	RealProgress uint
-	// Porcentaje completado según lo planificado
-	ExpectedProgress uint
-	// Avance o retraso real en días
-	RealProgressDays float64
-	// Indica si está archivado o no
-	Archived bool
-	// Fecha en la que el proyecto fue archivado
-	ArchivedDate time.Time `bson:"archivedDate"`
+	// Filtro SQL
+	filter string
 }
 
-// NewProjectPlan crea un nuevo plan de proyecto para poder ser planificado o revisado
-func NewProjectPlan(id gplan.ProjectPlanID, tasks []*Task, resources []*Resource, feastDays []*Holidays) *ProjectPlan {
-	return &ProjectPlan{
-		ID:        id,
-		Tasks:     tasks,
-		Resources: resources,
-		FeastDays: feastDays,
-	}
+func (s *ProjectPlan) Base() *gplan.ProjectPlanBase {
+	return s.ProjectPlanBase
 }
 
-// GetID Getter de ID
-func (p ProjectPlan) GetID() gplan.ProjectPlanID {
-	return p.ID
-}
-
-// GetStartDate Getter de StartDate
-func (p ProjectPlan) GetStartDate() time.Time {
-	return p.StartDate
-}
-
-// SetStartDate Setter de StartDate
-func (p *ProjectPlan) SetStartDate(date time.Time) {
-	p.StartDate = date
-}
-
-// GetEndDate Getter de EndDate
-func (p ProjectPlan) GetEndDate() time.Time {
-	return p.EndDate
-}
-
-// SetEndDate Setter de EndDate
-func (p *ProjectPlan) SetEndDate(date time.Time) {
-	p.EndDate = date
-}
-
-// GetEndDate Getter de EstimatedEndDate
-func (p ProjectPlan) GetEstimatedEndDate() time.Time {
-	return p.EstimatedEndDate
-}
-
-// SetEndDate Setter de EstimatedEndDate
-func (p *ProjectPlan) SetEstimatedEndDate(date time.Time) {
-	p.EstimatedEndDate = date
-}
-
-// GetWordays Getter de Workdays
-func (p ProjectPlan) GetWorkdays() uint {
-	return p.Workdays
-}
-
-// SetWorkdays Setter de Workdays
-func (p *ProjectPlan) SetWorkdays(n uint) {
-	p.Workdays = n
-}
-
-// GetTasks Devuelve un array de Task
-func (p ProjectPlan) GetTasks() []gplan.Task {
-	newArr := make([]gplan.Task, len(p.Tasks))
-	for i := range p.Tasks {
-		newArr[i] = p.Tasks[i]
+// GetTasks devuelve un nuevo array de ITask
+func (s *ProjectPlan) GetTasks() []gplan.ITask {
+	newArr := make([]gplan.ITask, len(s.Tasks))
+	for i := range s.Tasks {
+		newArr[i] = s.Tasks[i]
 	}
 	return newArr
 }
 
-// SortTasksByOrder Implementa SortByOrder
-func (p ProjectPlan) SortTasksByOrder() {
+// GetResources devuelve un nuevo array de IResource
+func (s *ProjectPlan) GetResources() []gplan.IResource {
+	newArr := make([]gplan.IResource, len(s.Resources))
+	for i := range s.Resources {
+		newArr[i] = s.Resources[i]
+	}
+	return newArr
+}
+
+// GetFeastDays devuelve un nuevo array de IHolidays
+func (s *ProjectPlan) GetFeastDays() []gplan.IHolidays {
+	newArr := make([]gplan.IHolidays, len(s.FeastDays))
+	for i := range s.FeastDays {
+		newArr[i] = s.FeastDays[i]
+	}
+	return newArr
+}
+
+// SortTasksByOrder Implementa SortTasksByOrder
+func (s ProjectPlan) SortTasksByOrder() {
 	// Ordena las tareas por número de orden para poder planificarlas
-	sort.Slice(p.Tasks, func(i, j int) bool {
-		return p.Tasks[i].Order < p.Tasks[j].Order
+	sort.Slice(s.Tasks, func(i, j int) bool {
+		return s.Tasks[i].Order < s.Tasks[j].Order
 	})
 }
 
-// GetResources Devuelve un nuevo array de Resources
-func (p ProjectPlan) GetResources() []gplan.Resource {
-	newArr := make([]gplan.Resource, len(p.Resources))
-	for i := range p.Resources {
-		newArr[i] = p.Resources[i]
+// NewProjectPlan crea un nuevo plan de proyecto para poder ser planificado o revisado
+func NewProjectPlan(id gplan.ProjectPlanID, filter string, tasks []*Task, resources []*Resource, feastDays []*Holidays) *ProjectPlan {
+	return &ProjectPlan{
+		ProjectPlanBase: gplan.NewProjectPlan(id),
+		Tasks:           tasks,
+		Resources:       resources,
+		FeastDays:       feastDays,
 	}
-	return newArr
-}
-
-// GetFeastDays Devuelve un nuevo array de Holidays
-func (p ProjectPlan) GetFeastDays() []gplan.Holidays {
-	newArr := make([]gplan.Holidays, len(p.FeastDays))
-	for i := range p.FeastDays {
-		newArr[i] = p.FeastDays[i]
-	}
-	return newArr
-}
-
-// GetComplete Getter de Complete
-func (p ProjectPlan) GetRealProgress() uint {
-	return p.RealProgress
-}
-
-// SetComplete Setter de Complete
-func (p *ProjectPlan) SetRealProgress(n uint) {
-	p.RealProgress = n
-}
-
-// GetEstimatedComplete Getter de EstimatedComplete
-func (p ProjectPlan) GetExpectedProgress() uint {
-	return p.ExpectedProgress
-}
-
-// SetEstimatedComplete Setter de EstimatedComplete
-func (p *ProjectPlan) SetExpectedProgress(n uint) {
-	p.ExpectedProgress = n
-}
-
-// GetRealAdvancedOrDelayed Getter de RealAdvancedOrDelayed
-func (p ProjectPlan) GetRealAdvancedOrDelayed() float64 {
-	return p.RealProgressDays
-}
-
-// SetRealAdvancedOrDelayed Setter de RealAdvancedOrDelayed
-func (p *ProjectPlan) SetRealAdvancedOrDelayed(n float64) {
-	p.RealProgressDays = n
-}
-
-// IsArchived Getter de Archived
-func (p ProjectPlan) IsArchived() bool {
-	return p.Archived
-}
-
-// SetArchived Getter de Archived
-func (p *ProjectPlan) SetArchived(archived bool) {
-	p.Archived = archived
-}
-
-// GetArchivedDate Getter de ArchivedDate
-func (p ProjectPlan) GetArchivedDate() time.Time {
-	return p.ArchivedDate
-}
-
-// SetArchivedDate Setter de ArchivedDate
-func (p *ProjectPlan) SetArchivedDate(date time.Time) {
-	p.ArchivedDate = date
 }

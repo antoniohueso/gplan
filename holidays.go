@@ -5,11 +5,11 @@ import (
 )
 
 type IHolidays interface {
-	GetHolidays() *Holidays
+	Base() *HolidaysBase
 }
 
 // HolidaysBase contiene información de un rango de fechas de vacaciones o días de fiesta
-type Holidays struct {
+type HolidaysBase struct {
 	// Fecha de vacaciones/fiesta desde
 	From time.Time `json:"from"`
 	// Fecha de vacaciones/fiesta Hasta
@@ -17,13 +17,9 @@ type Holidays struct {
 }
 
 // NewHolidays crea un nuevo rango de fechas de vacaciones
-func NewHolidays(from time.Time, to time.Time) *Holidays {
-	return &Holidays{
+func NewHolidaysBase(from time.Time, to time.Time) *HolidaysBase {
+	return &HolidaysBase{
 		From: from,
 		To:   to,
 	}
-}
-
-func (s *Holidays) GetHolidays() *Holidays {
-	return s
 }

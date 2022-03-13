@@ -56,7 +56,7 @@ func IsLaborableDay(day time.Time, feastDays []IHolidays) bool {
 
 	// Si el día que recibimos está entre los rangos de vacaciones o días de fiesta devuelve False
 	for _, h := range feastDays {
-		if dateutil.IsBetween(day, h.GetHolidays().From, h.GetHolidays().To) {
+		if dateutil.IsBetween(day, h.Base().From, h.Base().To) {
 			return false
 		}
 	}

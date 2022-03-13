@@ -39,13 +39,10 @@ var _ = Describe("gplan", func() {
 
 	Describe("New - Validaciones", func() {
 
-		println(resources)
-		println(feastDays)
-
 		Context("Si recibe una lista de tareas vacía", func() {
 			It("Debe devolver un error", func() {
 
-				plan := NewProjectPlan("test", nil, nil, nil)
+				plan := NewProjectPlan("test", "select * from issues", nil, nil, nil)
 
 				err := gplan.Planning(time.Now(), plan)
 				Expect(err).ShouldNot(BeNil())
@@ -56,7 +53,7 @@ var _ = Describe("gplan", func() {
 		Context("Si recibe una lista de recursos vacía", func() {
 			It("Debe devolver un error", func() {
 
-				plan := NewProjectPlan("test", []*Task{{}}, nil, nil)
+				plan := NewProjectPlan("test", "select * from issues", []*Task{{}}, nil, nil)
 				err := gplan.Planning(time.Now(), plan)
 				Expect(err).ShouldNot(BeNil())
 				Expect(err.Message).Should(Equal(fmt.Errorf("la lista de recursos a asignar está vacía")))
@@ -66,7 +63,7 @@ var _ = Describe("gplan", func() {
 		Context("Si hay tareas con una duración < 1", func() {
 
 			It("Debe devolver un error", func() {
-				plan := NewProjectPlan("test", []*Task{
+				plan := NewProjectPlan("test", "select * from issues", []*Task{
 					NewTask("Task-2", "summary Task-2", "maquetación", 100, 1),
 					NewTask("Task-1", "summary Task-1", "maquetación", 100, 0)},
 					[]*Resource{{}},
@@ -84,7 +81,7 @@ var _ = Describe("gplan", func() {
 		Context("Si hay tareas con un orden < 1", func() {
 
 			It("Debe devolver un error", func() {
-				plan := NewProjectPlan("test", []*Task{
+				plan := NewProjectPlan("test", "select * from issues", []*Task{
 					NewTask("Task-2", "summary Task-2", "maquetación", 1, 1),
 					NewTask("Task-1", "summary Task-1", "maquetación", 0, 1)},
 					[]*Resource{{}},
@@ -103,7 +100,7 @@ var _ = Describe("gplan", func() {
 
 			It("Debe devolver un error", func() {
 
-				plan := NewProjectPlan("test", []*Task{
+				plan := NewProjectPlan("test", "select * from issues", []*Task{
 					NewTask("Task-2", "summary Task-2", "maquetación", 100, 1),
 					NewTask("Task-1", "summary Task-1", "backend", 100, 2)},
 					[]*Resource{
@@ -124,7 +121,7 @@ var _ = Describe("gplan", func() {
 
 			It("Debe devolver un error", func() {
 
-				plan := NewProjectPlan("test",
+				plan := NewProjectPlan("test", "select * from issues",
 					[]*Task{
 						NewTask("Task-2", "summary Task-2", "maquetación", 100, 1),
 					},
@@ -143,10 +140,11 @@ var _ = Describe("gplan", func() {
 		Context("Si hay referencias circulares simples", func() {
 
 			It("Debe devolver un error", func() {
-				task1 := NewTaskWithBlocks("Task-1", "summary Task-1", "backend", 10, 1, []*TaskDependency{NewTaskDependency("Task-2")}, nil)
-				task2 := NewTaskWithBlocks("Task-2", "summary Task-2", "backend", 20, 2, []*TaskDependency{NewTaskDependency("Task-1")}, nil)
+				task1 := NewTaskWithBlocks("Task-1", "summary Task-1", "backend", 10, 1, []*TaskDependency{NewTaskDependency("Task-2", "summary task2", "KEYURL")}, nil)
+				task2 := NewTaskWithBlocks("Task-2", "summary Task-2", "backend", 20, 2, []*TaskDependency{NewTaskDependency("Task-1", "summary task2", "KEYURL")}, nil)
 
 				plan := NewProjectPlan("test",
+					"select * from issues",
 					[]*Task{task1, task2},
 					[]*Resource{NewResource("ahg", "Antonio Hueso", "backend", time.Now(), nil)},
 					nil)
@@ -161,11 +159,12 @@ var _ = Describe("gplan", func() {
 		Context("Si hay referencias circulares complejas", func() {
 
 			It("Debe devolver un error", func() {
-				task1 := NewTaskWithBlocks("Task-1", "summary Task-1", "backend", 10, 1, []*TaskDependency{NewTaskDependency("Task-2")}, nil)
-				task2 := NewTaskWithBlocks("Task-2", "summary Task-2", "backend", 20, 2, []*TaskDependency{NewTaskDependency("Task-3")}, nil)
-				task3 := NewTaskWithBlocks("Task-3", "summary Task-3", "backend", 30, 2, []*TaskDependency{NewTaskDependency("Task-1")}, nil)
+				task1 := NewTaskWithBlocks("Task-1", "summary Task-1", "backend", 10, 1, []*TaskDependency{NewTaskDependency("Task-2", "summay t2", "keyurl")}, nil)
+				task2 := NewTaskWithBlocks("Task-2", "summary Task-2", "backend", 20, 2, []*TaskDependency{NewTaskDependency("Task-3", "summay t3", "keyurl")}, nil)
+				task3 := NewTaskWithBlocks("Task-3", "summary Task-3", "backend", 30, 2, []*TaskDependency{NewTaskDependency("Task-1", "summay t1", "keyurl")}, nil)
 
 				plan := NewProjectPlan("test",
+					"select * from issues",
 					[]*Task{task1, task2, task3},
 					[]*Resource{NewResource("ahg", "Antonio Hueso", "backend", time.Now(), nil)},
 					nil)
@@ -180,11 +179,12 @@ var _ = Describe("gplan", func() {
 		Context("Si hay tareas que bloquean a tareas que no existen en la lista de tareas", func() {
 
 			It("Debe devolver un error", func() {
-				task1 := NewTaskWithBlocks("Task-1", "summary Task-1", "backend", 10, 1, []*TaskDependency{NewTaskDependency("Task-No-Existe")}, nil)
+				task1 := NewTaskWithBlocks("Task-1", "summary Task-1", "backend", 10, 1, []*TaskDependency{NewTaskDependency("Task-No-Existe", "", "")}, nil)
 				task2 := NewTaskWithBlocks("Task-2", "summary Task-2", "backend", 20, 2, nil, nil)
 				task3 := NewTaskWithBlocks("Task-3", "summary Task-3", "backend", 30, 2, nil, nil)
 
 				plan := NewProjectPlan("test",
+					"select * from issues",
 					[]*Task{task1, task2, task3},
 					[]*Resource{NewResource("ahg", "Antonio Hueso", "backend", time.Now(), nil)},
 					nil)
@@ -199,10 +199,11 @@ var _ = Describe("gplan", func() {
 		Context("Si hay tareas que bloquean a otras cuyo orden es inferior", func() {
 
 			It("Debe devolver un error", func() {
-				task1 := NewTaskWithBlocks("Task-1", "summary Task-1", "backend", 20, 1, []*TaskDependency{NewTaskDependency("Task-2")}, nil)
+				task1 := NewTaskWithBlocks("Task-1", "summary Task-1", "backend", 20, 1, []*TaskDependency{NewTaskDependency("Task-2", "summay t2", "keyurl")}, nil)
 				task2 := NewTaskWithBlocks("Task-2", "summary Task-2", "backend", 10, 2, nil, nil)
 
 				plan := NewProjectPlan("test",
+					"select * from issues",
 					[]*Task{task1, task2},
 					[]*Resource{NewResource("ahg", "Antonio Hueso", "backend", time.Now(), nil)},
 					nil)
@@ -231,10 +232,11 @@ var _ = Describe("gplan", func() {
 					NewTask("Tarea6", "Summary", "backend", 40, 9),
 				}
 
-				plan := NewProjectPlan("test-plan", tasks, resources, feastDays)
+				plan := NewProjectPlan("test-plan", "select * from issues", tasks, resources, feastDays)
 				err := gplan.Planning(parseDate("2021-06-07"), plan)
 
 				Expect(err).Should(BeNil())
+
 				comparePlan(plan.Tasks, []string{
 					"2021-06-07 2021-06-22 cslopez",
 					"2021-06-14 2021-06-14 ahg",
@@ -265,7 +267,7 @@ var _ = Describe("gplan", func() {
 				BlocksTo(tasks[5], tasks[2])
 				BlocksTo(tasks[5], tasks[1])
 
-				plan := NewProjectPlan("test-plan", tasks, resources, feastDays)
+				plan := NewProjectPlan("test-plan", "select * from issues", tasks, resources, feastDays)
 				err := gplan.Planning(parseDate("2021-06-07"), plan)
 
 				Expect(err).Should(BeNil())
@@ -304,7 +306,7 @@ var _ = Describe("gplan", func() {
 
 			var err *gplan.Error
 
-			plan = NewProjectPlan("test-plan", tasks, resources, feastDays)
+			plan = NewProjectPlan("test-plan", "select * from issues", tasks, resources, feastDays)
 			err = gplan.Planning(parseDate("2021-06-07"), plan)
 
 			Expect(err).Should(BeNil())
@@ -494,8 +496,8 @@ var _ = Describe("gplan", func() {
 func printPlan(plan *ProjectPlan) {
 	fmt.Println()
 	for _, task := range plan.Tasks {
-		fmt.Printf("%s|%02d|%s|%s|%s\n", task.ID, task.Duration, task.StartDate.Format("2006-01-02"), task.EndDate.Format("2006-01-02"),
-			task.Resource.GetID())
+		fmt.Printf("%s|%02d|%02d|%s|%s|%s\n", task.ID, task.Order, task.Duration, task.StartDate.Format("2006-01-02"), task.EndDate.Format("2006-01-02"),
+			task.Resource.ID)
 	}
 }
 
@@ -504,7 +506,7 @@ func comparePlan(tasks []*Task, compare []string) {
 
 	for i := range tasks {
 		s := fmt.Sprintf("%s %s %s", tasks[i].StartDate.Format("2006-01-02"), tasks[i].EndDate.Format("2006-01-02"),
-			tasks[i].Resource.GetID())
+			tasks[i].Resource.ID)
 		sTasks = append(sTasks, s)
 		//log.Println(s)
 	}
