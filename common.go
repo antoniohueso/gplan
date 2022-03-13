@@ -34,8 +34,8 @@ func CalculateLaborableDate(from time.Time, days int, holidays []Holidays) time.
 }
 
 // CalculateLaborableDays Devuelve los días laborables que hay entre dos fechas, incluidas ambas.
-func CalculateLaborableDays(from time.Time, to time.Time, holidays []Holidays) int {
-	days := 0
+func CalculateLaborableDays(from time.Time, to time.Time, holidays []Holidays) uint {
+	var days uint
 	date := from
 	for dateutil.IsLte(date, to) {
 		if IsLaborableDay(date, holidays) {

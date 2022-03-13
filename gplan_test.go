@@ -316,9 +316,9 @@ var _ = Describe("gplan", func() {
 			It("El avance debe ser el de 0%:", func() {
 				err := gplan.Review(plan, parseDate("2021-06-07"))
 				Expect(err).Should(BeNil())
-				Expect(plan.EstimatedComplete).Should(BeZero())
-				Expect(plan.Complete).Should(BeZero())
-				Expect(plan.RealAdvancedOrDelayed).Should(BeZero())
+				Expect(plan.ExpectedProgress).Should(BeZero())
+				Expect(plan.RealProgress).Should(BeZero())
+				Expect(plan.RealProgressDays).Should(BeZero())
 				Expect(plan.EstimatedEndDate).Should(Equal(plan.EndDate))
 			})
 		})
@@ -328,9 +328,9 @@ var _ = Describe("gplan", func() {
 			It("El avance debe ser que hay retraso:", func() {
 				err := gplan.Review(plan, parseDate("2021-06-08"))
 				Expect(err).Should(BeNil())
-				Expect(plan.EstimatedComplete).Should(Equal(4))
-				Expect(plan.Complete).Should(BeZero())
-				Expect(plan.RealAdvancedOrDelayed).Should(Equal(1.2))
+				Expect(plan.ExpectedProgress).Should(Equal(uint(4)))
+				Expect(plan.RealProgress).Should(BeZero())
+				Expect(plan.RealProgressDays).Should(Equal(1.2))
 				Expect(plan.EstimatedEndDate).Should(Equal(parseDate("2021-07-26")))
 			})
 		})
@@ -338,12 +338,12 @@ var _ = Describe("gplan", func() {
 		Context("Revisión día 2021-06-17 con la 'tarea 1' completada", func() {
 
 			It("El avance debe ser que hay retraso:", func() {
-				plan.Tasks[2].Complete = 100
+				plan.Tasks[2].RealProgress = 100
 				err := gplan.Review(plan, parseDate("2021-06-17"))
 				Expect(err).Should(BeNil())
-				Expect(plan.EstimatedComplete).Should(Equal(24))
-				Expect(plan.Complete).Should(Equal(20))
-				Expect(plan.RealAdvancedOrDelayed).Should(Equal(1.2))
+				Expect(plan.ExpectedProgress).Should(Equal(uint(24)))
+				Expect(plan.RealProgress).Should(Equal(uint(20)))
+				Expect(plan.RealProgressDays).Should(Equal(1.2))
 				Expect(plan.EstimatedEndDate).Should(Equal(parseDate("2021-07-26")))
 			})
 		})
@@ -351,18 +351,18 @@ var _ = Describe("gplan", func() {
 		Context("Revisión día 2021-07-01 con diferentes porcentajes completados", func() {
 
 			It("El avance debe ser que hay retraso:", func() {
-				plan.Tasks[0].Complete = 100
-				plan.Tasks[1].Complete = 60
-				plan.Tasks[2].Complete = 10
-				plan.Tasks[3].Complete = 100
-				plan.Tasks[4].Complete = 5
-				plan.Tasks[5].Complete = 100
+				plan.Tasks[0].RealProgress = 100
+				plan.Tasks[1].RealProgress = 60
+				plan.Tasks[2].RealProgress = 10
+				plan.Tasks[3].RealProgress = 100
+				plan.Tasks[4].RealProgress = 5
+				plan.Tasks[5].RealProgress = 100
 
 				err := gplan.Review(plan, parseDate("2021-07-01"))
 				Expect(err).Should(BeNil())
-				Expect(plan.EstimatedComplete).Should(Equal(69))
-				Expect(plan.Complete).Should(Equal(61))
-				Expect(plan.RealAdvancedOrDelayed).Should(Equal(2.4))
+				Expect(plan.ExpectedProgress).Should(Equal(uint(69)))
+				Expect(plan.RealProgress).Should(Equal(uint(61)))
+				Expect(plan.RealProgressDays).Should(Equal(2.4))
 				Expect(plan.EstimatedEndDate).Should(Equal(parseDate("2021-07-27")))
 			})
 		})
@@ -370,18 +370,18 @@ var _ = Describe("gplan", func() {
 		Context("Revisión día 2021-07-01 con avances significativos", func() {
 
 			It("El avance debe ser que hay adelanto:", func() {
-				plan.Tasks[0].Complete = 100
-				plan.Tasks[1].Complete = 60
-				plan.Tasks[2].Complete = 80
-				plan.Tasks[3].Complete = 100
-				plan.Tasks[4].Complete = 100
-				plan.Tasks[5].Complete = 100
+				plan.Tasks[0].RealProgress = 100
+				plan.Tasks[1].RealProgress = 60
+				plan.Tasks[2].RealProgress = 80
+				plan.Tasks[3].RealProgress = 100
+				plan.Tasks[4].RealProgress = 100
+				plan.Tasks[5].RealProgress = 100
 
 				err := gplan.Review(plan, parseDate("2021-07-01"))
 				Expect(err).Should(BeNil())
-				Expect(plan.EstimatedComplete).Should(Equal(69))
-				Expect(plan.Complete).Should(Equal(79))
-				Expect(plan.RealAdvancedOrDelayed).Should(Equal(-3.0))
+				Expect(plan.ExpectedProgress).Should(Equal(uint(69)))
+				Expect(plan.RealProgress).Should(Equal(uint(79)))
+				Expect(plan.RealProgressDays).Should(Equal(-3.0))
 				Expect(plan.EstimatedEndDate).Should(Equal(parseDate("2021-07-15")))
 			})
 		})
@@ -390,7 +390,7 @@ var _ = Describe("gplan", func() {
 
 			It("El avance debe ser una gran adelanto:", func() {
 				for _, task := range plan.Tasks {
-					task.Complete = 100
+					task.RealProgress = 100
 					task.RealEndDate = task.EndDate
 				}
 
@@ -399,9 +399,9 @@ var _ = Describe("gplan", func() {
 
 				err := gplan.Review(plan, parseDate("2021-07-01"))
 				Expect(err).Should(BeNil())
-				Expect(plan.EstimatedComplete).Should(Equal(69))
-				Expect(plan.Complete).Should(Equal(100))
-				Expect(plan.RealAdvancedOrDelayed).Should(Equal(-14.0))
+				Expect(plan.ExpectedProgress).Should(Equal(uint(69)))
+				Expect(plan.RealProgress).Should(Equal(uint(100)))
+				Expect(plan.RealProgressDays).Should(Equal(-14.0))
 				Expect(plan.EstimatedEndDate).Should(Equal(parseDate("2021-06-30")))
 			})
 		})
@@ -411,15 +411,15 @@ var _ = Describe("gplan", func() {
 			It("El avance debe ser completado sin retraso:", func() {
 
 				for _, task := range plan.Tasks {
-					task.Complete = 100
+					task.RealProgress = 100
 					task.RealEndDate = task.EndDate
 				}
 
 				err := gplan.Review(plan, parseDate("2021-07-21"))
 				Expect(err).Should(BeNil())
-				Expect(plan.EstimatedComplete).Should(Equal(100))
-				Expect(plan.Complete).Should(Equal(100))
-				Expect(plan.RealAdvancedOrDelayed).Should(Equal(0.0))
+				Expect(plan.ExpectedProgress).Should(Equal(uint(100)))
+				Expect(plan.RealProgress).Should(Equal(uint(100)))
+				Expect(plan.RealProgressDays).Should(Equal(0.0))
 				Expect(plan.EstimatedEndDate).Should(Equal(parseDate("2021-07-20")))
 			})
 		})
@@ -429,15 +429,15 @@ var _ = Describe("gplan", func() {
 			It("El avance debe ser ser completado sin retraso:", func() {
 
 				for _, task := range plan.Tasks {
-					task.Complete = 100
+					task.RealProgress = 100
 					task.RealEndDate = task.EndDate
 				}
 
 				err := gplan.Review(plan, parseDate("2021-07-26"))
 				Expect(err).Should(BeNil())
-				Expect(plan.EstimatedComplete).Should(Equal(100))
-				Expect(plan.Complete).Should(Equal(100))
-				Expect(plan.RealAdvancedOrDelayed).Should(Equal(0.0))
+				Expect(plan.ExpectedProgress).Should(Equal(uint(100)))
+				Expect(plan.RealProgress).Should(Equal(uint(100)))
+				Expect(plan.RealProgressDays).Should(Equal(0.0))
 				Expect(plan.EstimatedEndDate).Should(Equal(parseDate("2021-07-20")))
 			})
 		})
@@ -446,24 +446,24 @@ var _ = Describe("gplan", func() {
 
 			It("El avance debe ser un gran retraso:", func() {
 
-				plan.Tasks[0].Complete = 100
-				plan.Tasks[1].Complete = 60
-				plan.Tasks[2].Complete = 10
-				plan.Tasks[3].Complete = 100
-				plan.Tasks[4].Complete = 5
-				plan.Tasks[5].Complete = 100
+				plan.Tasks[0].RealProgress = 100
+				plan.Tasks[1].RealProgress = 60
+				plan.Tasks[2].RealProgress = 10
+				plan.Tasks[3].RealProgress = 100
+				plan.Tasks[4].RealProgress = 5
+				plan.Tasks[5].RealProgress = 100
 
 				for _, task := range plan.Tasks {
-					if task.Complete == 100 {
+					if task.RealProgress == 100 {
 						task.RealEndDate = task.EndDate
 					}
 				}
 
 				err := gplan.Review(plan, parseDate("2021-07-26"))
 				Expect(err).Should(BeNil())
-				Expect(plan.EstimatedComplete).Should(Equal(100))
-				Expect(plan.Complete).Should(Equal(61))
-				Expect(plan.RealAdvancedOrDelayed).Should(Equal(12.7))
+				Expect(plan.ExpectedProgress).Should(Equal(uint(100)))
+				Expect(plan.RealProgress).Should(Equal(uint(61)))
+				Expect(plan.RealProgressDays).Should(Equal(12.7))
 				Expect(plan.EstimatedEndDate).Should(Equal(parseDate("2021-08-10")))
 			})
 		})
@@ -473,16 +473,16 @@ var _ = Describe("gplan", func() {
 			It("El avance debe ser completado con retraso:", func() {
 
 				for _, task := range plan.Tasks {
-					task.Complete = 100
+					task.RealProgress = 100
 					task.RealEndDate = task.EndDate
 				}
 				plan.Tasks[1].RealEndDate = parseDate("2021-07-26")
 
 				err := gplan.Review(plan, parseDate("2021-07-30"))
 				Expect(err).Should(BeNil())
-				Expect(plan.EstimatedComplete).Should(Equal(100))
-				Expect(plan.Complete).Should(Equal(100))
-				Expect(plan.RealAdvancedOrDelayed).Should(Equal(2.0))
+				Expect(plan.ExpectedProgress).Should(Equal(uint(100)))
+				Expect(plan.RealProgress).Should(Equal(uint(100)))
+				Expect(plan.RealProgressDays).Should(Equal(2.0))
 				Expect(plan.EstimatedEndDate).Should(Equal(parseDate("2021-07-26")))
 			})
 		})
@@ -519,5 +519,5 @@ func parseDate(date string) time.Time {
 	if err != nil {
 		log.Fatal(err)
 	}
-	return f
+	return f.Local()
 }

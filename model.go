@@ -43,7 +43,7 @@ type Task interface {
 	// Número de orden de la tarea dentro de la lista de tareas
 	GetOrder() int
 	// Duración de la tarea en días
-	GetDuration() int
+	GetDuration() uint
 	// Lista de tareas a las que bloquea y no se pueden empezar hasta que estuviera completada
 	GetBlocksTo() []TaskDependency
 	// Lista de tareas que bloquean a esta tarea y no podría empezarse hasta que estuvieran completadas
@@ -58,11 +58,11 @@ type Task interface {
 	GetEndDate() time.Time
 	SetEndDate(date time.Time)
 	// Porcentaje real completado
-	GetComplete() int
-	SetComplete(n int)
+	GetRealProgress() uint
+	SetRealProgress(n uint)
 	// Porcentaje completado según lo planificado
-	GetEstimatedComplete() int
-	SetEstimatedComplete(n int)
+	GetExpectedProgress() uint
+	SetExpectedProgress(n uint)
 	// Fecha en la que realmente finalizó
 	GetRealEndDate() time.Time
 	SetRealEndDate(date time.Time)
@@ -88,11 +88,11 @@ type ProjectPlan interface {
 	// Días de fiesta
 	GetFeastDays() []Holidays
 	// Porcentaje real completado
-	GetComplete() int
-	SetComplete(n int)
+	GetRealProgress() uint
+	SetRealProgress(n uint)
 	// Porcentaje completado según lo planificado
-	GetEstimatedComplete() int
-	SetEstimatedComplete(n int)
+	GetExpectedProgress() uint
+	SetExpectedProgress(n uint)
 	// Avance o retraso real en días
 	GetRealAdvancedOrDelayed() float64
 	SetRealAdvancedOrDelayed(n float64)
@@ -100,8 +100,8 @@ type ProjectPlan interface {
 	GetEstimatedEndDate() time.Time
 	SetEstimatedEndDate(date time.Time)
 	// Total de jornadas de trabajo del proyecto
-	GetWorkdays() int
-	SetWorkdays(n int)
+	GetWorkdays() uint
+	SetWorkdays(n uint)
 	// Si está archivado o no
 	IsArchived() bool
 	SetArchived(archived bool)

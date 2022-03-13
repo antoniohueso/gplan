@@ -330,7 +330,7 @@ func scheduledTask(task Task, resource Resource, feastDays []Holidays) *schedule
 	var (
 		holidaysAndFeastDays []Holidays
 		realStartDate        time.Time
-		duration             int
+		duration             uint
 		endDate              time.Time
 	)
 

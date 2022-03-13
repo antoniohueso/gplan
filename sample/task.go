@@ -17,7 +17,7 @@ type Task struct {
 	// Número de orden de la tarea dentro de la lista de tareas
 	Order int
 	// Duración de la tarea en días
-	Duration int
+	Duration uint
 	// Lista de tareas a las que bloquea y no se pueden empezar hasta que estuviera completada
 	BlocksTo []*TaskDependency
 	// Lista de tareas que bloquean a esta tarea y no podría empezarse hasta que estuvieran completadas
@@ -29,20 +29,20 @@ type Task struct {
 	// Fecha planificada de fin de la tarea
 	EndDate time.Time
 	// Porcentaje real completado
-	Complete int
+	RealProgress uint
 	// Porcentaje completado según lo planificado
-	EstimatedComplete int
+	ExpectedProgress uint
 	// Fecha real de finalización
 	RealEndDate time.Time
 }
 
 // NewTask crea una nueva tarea sin bloqueos
-func NewTask(id gplan.TaskID, summary string, resourceType string, order int, duration int) *Task {
+func NewTask(id gplan.TaskID, summary string, resourceType string, order int, duration uint) *Task {
 	return NewTaskWithBlocks(id, summary, resourceType, order, duration, nil, nil)
 }
 
 // NewTaskWithBlocks crea una nueva tarea con bloqueos
-func NewTaskWithBlocks(id gplan.TaskID, summary string, resourceType string, order int, duration int, blocksTo []*TaskDependency, blocksBy []*TaskDependency) *Task {
+func NewTaskWithBlocks(id gplan.TaskID, summary string, resourceType string, order int, duration uint, blocksTo []*TaskDependency, blocksBy []*TaskDependency) *Task {
 
 	if blocksTo == nil {
 		blocksTo = []*TaskDependency{}
@@ -79,7 +79,7 @@ func (t Task) GetOrder() int {
 }
 
 // GetDuration Getter de Duration
-func (t Task) GetDuration() int {
+func (t Task) GetDuration() uint {
 	return t.Duration
 }
 
@@ -132,23 +132,23 @@ func (t *Task) SetEndDate(date time.Time) {
 }
 
 // GetComplete Getter de Complete
-func (t Task) GetComplete() int {
-	return t.Complete
+func (t Task) GetRealProgress() uint {
+	return t.RealProgress
 }
 
 // SetComplete Setter de Complete
-func (t *Task) SetComplete(n int) {
-	t.Complete = n
+func (t *Task) SetRealProgress(n uint) {
+	t.RealProgress = n
 }
 
 // GetEstimatedComplete Getter de EstimatedComplete
-func (t Task) GetEstimatedComplete() int {
-	return t.EstimatedComplete
+func (t Task) GetExpectedProgress() uint {
+	return t.ExpectedProgress
 }
 
 // SetEstimatedComplete Setter de EstimatedComplete
-func (t *Task) SetEstimatedComplete(n int) {
-	t.EstimatedComplete = n
+func (t *Task) SetExpectedProgress(n uint) {
+	t.ExpectedProgress = n
 }
 
 // GetRealEndDate Getter de RealEndDate

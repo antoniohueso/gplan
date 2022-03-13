@@ -19,7 +19,7 @@ type ProjectPlan struct {
 	// Fecha estimada de fin calculada en cada revisión en función de los días de avance o retraso y los días de fiesta
 	EstimatedEndDate time.Time
 	// Total jornadas de trabajo del proyecto
-	Workdays int
+	Workdays uint
 	// Lista de tareas planificadas en el proyecto
 	Tasks []*Task
 	// Lista de recursos
@@ -27,11 +27,11 @@ type ProjectPlan struct {
 	// Días de fiesta
 	FeastDays []*Holidays
 	// Porcentaje real completado
-	Complete int
+	RealProgress uint
 	// Porcentaje completado según lo planificado
-	EstimatedComplete int
+	ExpectedProgress uint
 	// Avance o retraso real en días
-	RealAdvancedOrDelayed float64
+	RealProgressDays float64
 	// Indica si está archivado o no
 	Archived bool
 	// Fecha en la que el proyecto fue archivado
@@ -84,12 +84,12 @@ func (p *ProjectPlan) SetEstimatedEndDate(date time.Time) {
 }
 
 // GetWordays Getter de Workdays
-func (p ProjectPlan) GetWorkdays() int {
+func (p ProjectPlan) GetWorkdays() uint {
 	return p.Workdays
 }
 
 // SetWorkdays Setter de Workdays
-func (p *ProjectPlan) SetWorkdays(n int) {
+func (p *ProjectPlan) SetWorkdays(n uint) {
 	p.Workdays = n
 }
 
@@ -129,33 +129,33 @@ func (p ProjectPlan) GetFeastDays() []gplan.Holidays {
 }
 
 // GetComplete Getter de Complete
-func (p ProjectPlan) GetComplete() int {
-	return p.Complete
+func (p ProjectPlan) GetRealProgress() uint {
+	return p.RealProgress
 }
 
 // SetComplete Setter de Complete
-func (p *ProjectPlan) SetComplete(n int) {
-	p.Complete = n
+func (p *ProjectPlan) SetRealProgress(n uint) {
+	p.RealProgress = n
 }
 
 // GetEstimatedComplete Getter de EstimatedComplete
-func (p ProjectPlan) GetEstimatedComplete() int {
-	return p.EstimatedComplete
+func (p ProjectPlan) GetExpectedProgress() uint {
+	return p.ExpectedProgress
 }
 
 // SetEstimatedComplete Setter de EstimatedComplete
-func (p *ProjectPlan) SetEstimatedComplete(n int) {
-	p.EstimatedComplete = n
+func (p *ProjectPlan) SetExpectedProgress(n uint) {
+	p.ExpectedProgress = n
 }
 
 // GetRealAdvancedOrDelayed Getter de RealAdvancedOrDelayed
 func (p ProjectPlan) GetRealAdvancedOrDelayed() float64 {
-	return p.RealAdvancedOrDelayed
+	return p.RealProgressDays
 }
 
 // SetRealAdvancedOrDelayed Setter de RealAdvancedOrDelayed
 func (p *ProjectPlan) SetRealAdvancedOrDelayed(n float64) {
-	p.RealAdvancedOrDelayed = n
+	p.RealProgressDays = n
 }
 
 // IsArchived Getter de Archived

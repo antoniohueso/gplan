@@ -23,18 +23,18 @@ func Review(plan ProjectPlan, reviewDate time.Time) *Error {
 	}
 
 	// Calcula el avance estimado
-	plan.SetEstimatedComplete(calculateEstimatedAdvance(
+	plan.SetExpectedProgress(calculateExpectedProgress(
 		tasks,
 		feastDays,
 		reviewDate))
 
 	// Calcula el avance real
-	plan.SetComplete(calculateRealAdvance(tasks))
+	plan.SetRealProgress(calculateRealProgress(tasks))
 
 	// Si el plan está al 100% calcula la fecha de finalización real mayor para ponerla como fecha final real del proyecto
 	// Y calcular el retraso o adelanto
 	var lastResolvedDate time.Time
-	if plan.GetComplete() == 100 || plan.IsArchived() {
+	if plan.GetRealProgress() == 100 || plan.IsArchived() {
 		for _, task := range tasks {
 			if dateutil.IsGt(task.GetRealEndDate(), lastResolvedDate) {
 				lastResolvedDate = task.GetRealEndDate()
@@ -42,10 +42,10 @@ func Review(plan ProjectPlan, reviewDate time.Time) *Error {
 		}
 	}
 
-	estimatedAdvancedOrDelayedDays := calculateEstimatedAdvancedOrDelayedDays(
+	estimatedAdvancedOrDelayedDays := calculateProgressDays(
 		reviewDate,
-		plan.GetEstimatedComplete(),
-		plan.GetComplete(),
+		plan.GetExpectedProgress(),
+		plan.GetRealProgress(),
 		plan.GetStartDate(),
 		plan.GetEndDate(),
 		lastResolvedDate,
@@ -62,14 +62,14 @@ func Review(plan ProjectPlan, reviewDate time.Time) *Error {
 	return nil
 }
 
-// calculateEstimatedAdvance Calcula el % de avance en el que deberíamos estar en el día actual en función de la planificación.
+// calculateExpectedProgress Calcula el % de avance en el que deberíamos estar en el día actual en función de la planificación.
 // Sigue la programación de las tareas de manera que si currDate > que la fecha de fin de la tarea esta se considera como que debería
 // estar completa al 100% y si currDate es < startDate entonces se considera que debería estar al 0%. Si currDate está entre
 // startDate y endDate de una tarea calcula el % que debería llevar hasta el día actual.
-func calculateEstimatedAdvance(tasks []Task, feastDays []Holidays, currDate time.Time) int {
+func calculateExpectedProgress(tasks []Task, feastDays []Holidays, currDate time.Time) uint {
 
-	var estimatedAdvanced = 0
-	var totalDuration = 0
+	var estimatedAdvanced uint
+	var totalDuration uint
 
 	for _, task := range tasks {
 
@@ -84,43 +84,44 @@ func calculateEstimatedAdvance(tasks []Task, feastDays []Holidays, currDate time
 
 			currDays := CalculateLaborableDays(task.GetStartDate(), currDate.AddDate(0, 0, -1), holidaysAndFeastDays)
 			estimatedAdvanced += currDays
-			task.SetEstimatedComplete((currDays * 100) / task.GetDuration())
+			task.SetExpectedProgress((currDays * 100) / task.GetDuration())
 		} else if dateutil.IsGt(currDate, task.GetEndDate()) {
 			// Se ha pasado de la fecha fin, debería estar al 100%
-			task.SetEstimatedComplete(100)
+			task.SetExpectedProgress(100)
 			estimatedAdvanced += task.GetDuration()
 		} else {
 			// Es menor que la fecha de comienzo, debería estar al 0%
-			task.SetEstimatedComplete(0)
+			task.SetExpectedProgress(0)
 		}
 	}
 
 	// Se suman las duraciones que deberían estar completas o a medio completar y se calcula el % con respecto al
 	// total de la duración
+	// TODO: Esto lo calcula siempre a la baja,probar algún dia a redondear normalmente con math.Round(valor)
 	return (estimatedAdvanced * 100) / totalDuration
 }
 
-// calculateRealAdvance Calcula el % de avance real sumando la duración completada realmente y sacando el % con respecto de la suma
+// calculateRealProgress Calcula el % de avance real sumando la duración completada realmente y sacando el % con respecto de la suma
 // de todas las duraciones.
-func calculateRealAdvance(tasks []Task) int {
+func calculateRealProgress(tasks []Task) uint {
 
-	var totalCompleteXDuration int = 0
-	var totalDuration = 0
+	var totalCompleteXDuration uint
+	var totalDuration uint
 
 	for _, task := range tasks {
-		totalCompleteXDuration += task.GetComplete() * task.GetDuration()
+		totalCompleteXDuration += task.GetRealProgress() * task.GetDuration()
 		totalDuration += task.GetDuration()
 	}
 
 	return totalCompleteXDuration / totalDuration
 }
 
-// calculateEstimatedAdvancedOrDelayedDays Calcula la los días de retraso o adelanto que llevamos, si es positivo el valor será retraso
+// calculateProgressDays Calcula la los días de retraso o adelanto que llevamos, si es positivo el valor será retraso
 // si es negativo será adelanto
-func calculateEstimatedAdvancedOrDelayedDays(
+func calculateProgressDays(
 	reviewDate time.Time,
-	shouldCompleted int,
-	realCompleted int,
+	shouldCompleted uint,
+	realCompleted uint,
 	startDate time.Time,
 	endDate time.Time,
 	lastResolvedDate time.Time,
