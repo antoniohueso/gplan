@@ -34,7 +34,7 @@ type ProjectPlanBase struct {
 	EstimatedEndDate time.Time `json:"estimatedEndDate"`
 	Workdays         uint      `json:"workDays"`
 	// Indica si está archivado o no
-	IsArchived bool `json:"archived"`
+	IsArchived bool `json:"archived" bson:"archived"`
 	// Fecha en la que el proyecto fue archivado
 	ArchivedDate time.Time `json:"archivedDate"`
 	// Tareas completadas
