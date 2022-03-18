@@ -4,6 +4,7 @@ import (
 	"time"
 )
 
+// IHolidays interface a implementar
 type IHolidays interface {
 	Base() *HolidaysBase
 }
@@ -16,7 +17,7 @@ type HolidaysBase struct {
 	To time.Time `json:"to"`
 }
 
-// NewHolidays crea un nuevo rango de fechas de vacaciones
+// NewHolidaysBase crea un nuevo rango de fechas de vacaciones
 func NewHolidaysBase(from time.Time, to time.Time) *HolidaysBase {
 	return &HolidaysBase{
 		From: from,

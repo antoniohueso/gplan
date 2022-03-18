@@ -77,6 +77,7 @@ func newError(message string, tasks []TaskID, params ...interface{}) *Error {
 	}
 }
 
+// Version versión de la librería gplan
 func Version() string {
-	return "1.1.2"
+	return "1.18"
 }
