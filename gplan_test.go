@@ -247,6 +247,7 @@ var _ = Describe("gplan", func() {
 				Expect(plan.StartDate.Format("2006-01-02")).Should(Equal("2021-06-07"))
 				Expect(plan.EndDate.Format("2006-01-02")).Should(Equal("2021-07-06"))
 				Expect(plan.Workdays).Should(BeEquivalentTo(20))
+				Expect(plan.TotalTasks).Should(BeEquivalentTo(6))
 			})
 		})
 
@@ -282,6 +283,7 @@ var _ = Describe("gplan", func() {
 				Expect(plan.StartDate.Format("2006-01-02")).Should(Equal("2021-06-07"))
 				Expect(plan.EndDate.Format("2006-01-02")).Should(Equal("2021-07-20"))
 				Expect(plan.Workdays).Should(BeEquivalentTo(30))
+				Expect(plan.TotalTasks).Should(BeEquivalentTo(6))
 			})
 		})
 
@@ -314,6 +316,7 @@ var _ = Describe("gplan", func() {
 			Expect(plan.StartDate.Format("2006-01-02")).Should(Equal("2021-06-07"))
 			Expect(plan.EndDate.Format("2006-01-02")).Should(Equal("2021-07-20"))
 			Expect(plan.Workdays).Should(BeEquivalentTo(30))
+			Expect(plan.TotalTasks).Should(BeEquivalentTo(6))
 		})
 
 		When("Revisamos el plan el día del inicio del proyecto", func() {
