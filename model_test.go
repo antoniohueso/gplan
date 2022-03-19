@@ -18,7 +18,7 @@ type Holidays struct {
 }
 
 // NewHolidays crea un nuevo rango de fechas de vacaciones
-func NewHolidaysBase(from time.Time, to time.Time) *Holidays {
+func NewHolidays(from time.Time, to time.Time) *Holidays {
 	return &Holidays{
 		From: from,
 		To:   to,
@@ -327,15 +327,18 @@ type ProjectPlan struct {
 	// Lista de tareas
 	Tasks []*Task
 	// Lista de recursos
-	Resurces []*Resource
+	Resources []*Resource
 	// Festivos
 	FeastDays []*Holidays
 }
 
 // NewProjectPlan crea un nuevo plan de proyecto para poder ser planificado o revisado
-func NewProjectPlan(id gplan.ProjectPlanID) *ProjectPlan {
+func NewProjectPlan(id gplan.ProjectPlanID, tasks []*Task, resources []*Resource, feastDays []*Holidays) *ProjectPlan {
 	return &ProjectPlan{
-		ID: id,
+		ID:        id,
+		Tasks:     tasks,
+		Resources: resources,
+		FeastDays: feastDays,
 	}
 }
 
@@ -373,6 +376,14 @@ func (s *ProjectPlan) GetExpectedProgress() uint {
 
 func (s *ProjectPlan) SetExpectedProgress(n uint) {
 	s.ExpectedProgress = n
+}
+
+func (s *ProjectPlan) GetRealProgressDays() float64 {
+	return s.RealProgressDays
+}
+
+func (s *ProjectPlan) SetRealProgressDays(n float64) {
+	s.RealProgressDays = n
 }
 
 func (s *ProjectPlan) GetEstimatedEndDate() time.Time {
@@ -428,8 +439,8 @@ func (s *ProjectPlan) GetTasks() []gplan.Task {
 func (s *ProjectPlan) GetResources() []gplan.Resource {
 	var slice = []gplan.Resource{}
 
-	for i := range s.Resurces {
-		slice = append(slice, s.Resurces[i])
+	for i := range s.Resources {
+		slice = append(slice, s.Resources[i])
 	}
 
 	return slice
