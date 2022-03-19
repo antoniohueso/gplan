@@ -124,7 +124,7 @@ func validateTasks(aTasks []Task, resources []Resource) (map[TaskID]Task, *Error
 	// Tiene que haber tareas para los tipos de recurso que llegan
 	for _, resource := range resources {
 		if _, exist := typeOfTasks[resource.GetType()]; !exist {
-			return nil, newTextError("no existen tareas para el recurso %s de tipo %s", resource.GetID, resource.GetType)
+			return nil, newTextError("no existen tareas para el recurso %s de tipo %s", resource.GetID(), resource.GetType())
 		}
 	}
 

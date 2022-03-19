@@ -60,6 +60,9 @@ func Review(plan ProjectPlan, reviewDate time.Time) *Error {
 	plan.SetEstimatedEndDate(
 		CalculateLaborableDate(plan.GetEndDate(), int(math.Ceil(plan.GetRealProgressDays())), feastDays))
 
+	// Calcula el total de tareas completadas
+	plan.SetCompleteTasks(CalculateTotalTasksCompleted(tasks))
+
 	return nil
 }
 
@@ -174,4 +177,18 @@ func calculateProgressDays(
 	}
 
 	return result
+}
+
+// CalculateTotalTasksCompleted Calcula el número de tareas completas
+func CalculateTotalTasksCompleted(tasks []Task) uint {
+
+	var total uint
+
+	for _, task := range tasks {
+		if task.GetRealProgress() == 100 {
+			total++
+		}
+	}
+
+	return total
 }

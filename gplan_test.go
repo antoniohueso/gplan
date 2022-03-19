@@ -38,7 +38,7 @@ var _ = Describe("gplan", func() {
 
 	Describe("New - Validaciones", func() {
 
-		Context("Si recibe una lista de tareas vacía", func() {
+		When("recibe una lista de tareas vacía", func() {
 			It("Debe devolver un error", func() {
 
 				plan := NewProjectPlan("test", nil, nil, nil)
@@ -49,7 +49,7 @@ var _ = Describe("gplan", func() {
 			})
 		})
 
-		Context("Si recibe una lista de recursos vacía", func() {
+		When("recibe una lista de recursos vacía", func() {
 			It("Debe devolver un error", func() {
 
 				plan := NewProjectPlan("test", []*Task{{}}, nil, nil)
@@ -59,7 +59,7 @@ var _ = Describe("gplan", func() {
 			})
 		})
 
-		Context("Si hay tareas con una duración < 1", func() {
+		When("hay tareas con una duración < 1", func() {
 
 			It("Debe devolver un error", func() {
 				plan := NewProjectPlan("test", []*Task{
@@ -77,7 +77,7 @@ var _ = Describe("gplan", func() {
 			})
 		})
 
-		Context("Si hay tareas con un orden < 1", func() {
+		When("hay tareas con un orden < 1", func() {
 
 			It("Debe devolver un error", func() {
 				plan := NewProjectPlan("test", []*Task{
@@ -95,7 +95,7 @@ var _ = Describe("gplan", func() {
 			})
 		})
 
-		Context("Si hay tareas para tipos de recursos que no están en la lista de recursos", func() {
+		When("hay tareas para tipos de recursos que no están en la lista de recursos", func() {
 
 			It("Debe devolver un error", func() {
 
@@ -116,7 +116,7 @@ var _ = Describe("gplan", func() {
 			})
 		})
 
-		Context("Si no hay tareas del tipo necesario para los tipos de recursos que lleregan en la lista de recursos", func() {
+		When("no hay tareas del tipo necesario para los tipos de recursos que lleregan en la lista de recursos", func() {
 
 			It("Debe devolver un error", func() {
 
@@ -136,7 +136,7 @@ var _ = Describe("gplan", func() {
 			})
 		})
 
-		Context("Si hay referencias circulares simples", func() {
+		When("hay referencias circulares simples", func() {
 
 			It("Debe devolver un error", func() {
 				task1 := NewTaskWithBlocks("Task-1", "summary Task-1", "backend", 10, 1, []*TaskDependency{NewTaskDependency("Task-2")}, nil)
@@ -155,7 +155,7 @@ var _ = Describe("gplan", func() {
 			})
 		})
 
-		Context("Si hay referencias circulares complejas", func() {
+		When("hay referencias circulares complejas", func() {
 
 			It("Debe devolver un error", func() {
 				task1 := NewTaskWithBlocks("Task-1", "summary Task-1", "backend", 10, 1, []*TaskDependency{NewTaskDependency("Task-2")}, nil)
@@ -175,7 +175,7 @@ var _ = Describe("gplan", func() {
 			})
 		})
 
-		Context("Si hay tareas que bloquean a tareas que no existen en la lista de tareas", func() {
+		When("hay tareas que bloquean a tareas que no existen en la lista de tareas", func() {
 
 			It("Debe devolver un error", func() {
 				task1 := NewTaskWithBlocks("Task-1", "summary Task-1", "backend", 10, 1, []*TaskDependency{NewTaskDependency("Task-No-Existe")}, nil)
@@ -195,7 +195,7 @@ var _ = Describe("gplan", func() {
 			})
 		})
 
-		Context("Si hay tareas que bloquean a otras cuyo orden es inferior", func() {
+		When("hay tareas que bloquean a otras cuyo orden es inferior", func() {
 
 			It("Debe devolver un error", func() {
 				task1 := NewTaskWithBlocks("Task-1", "summary Task-1", "backend", 20, 1, []*TaskDependency{NewTaskDependency("Task-2")}, nil)
@@ -218,7 +218,7 @@ var _ = Describe("gplan", func() {
 
 	Describe("New - Creación", func() {
 
-		Context("Creamos un plan sin dependencias con dos días de fiesta", func() {
+		When("Creamos un plan sin dependencias con dos días de fiesta", func() {
 
 			It("El plan debe ser igual al siguiente plan", func() {
 
@@ -246,10 +246,11 @@ var _ = Describe("gplan", func() {
 				})
 				Expect(plan.StartDate.Format("2006-01-02")).Should(Equal("2021-06-07"))
 				Expect(plan.EndDate.Format("2006-01-02")).Should(Equal("2021-07-06"))
+				Expect(plan.Workdays).Should(BeEquivalentTo(20))
 			})
 		})
 
-		Context("Creamos un plan con dependencias con dos días de fiesta", func() {
+		When("Creamos un plan con dependencias con dos días de fiesta", func() {
 
 			It("El plan debe ser igual al siguiente plan", func() {
 
@@ -280,6 +281,7 @@ var _ = Describe("gplan", func() {
 				})
 				Expect(plan.StartDate.Format("2006-01-02")).Should(Equal("2021-06-07"))
 				Expect(plan.EndDate.Format("2006-01-02")).Should(Equal("2021-07-20"))
+				Expect(plan.Workdays).Should(BeEquivalentTo(30))
 			})
 		})
 
@@ -309,14 +311,17 @@ var _ = Describe("gplan", func() {
 			err = gplan.Planning(parseDate("2021-06-07"), plan)
 
 			Expect(err).Should(BeNil())
-
+			Expect(plan.StartDate.Format("2006-01-02")).Should(Equal("2021-06-07"))
+			Expect(plan.EndDate.Format("2006-01-02")).Should(Equal("2021-07-20"))
+			Expect(plan.Workdays).Should(BeEquivalentTo(30))
 		})
 
-		Context("Revisamos el plan el día del inicio del proyecto", func() {
+		When("Revisamos el plan el día del inicio del proyecto", func() {
 
 			It("El avance debe ser el de 0%:", func() {
 				err := gplan.Review(plan, parseDate("2021-06-07"))
 				Expect(err).Should(BeNil())
+				Expect(plan.CompleteTasks).Should(BeEquivalentTo(0))
 				Expect(plan.ExpectedProgress).Should(BeZero())
 				Expect(plan.RealProgress).Should(BeZero())
 				Expect(plan.RealProgressDays).Should(BeZero())
@@ -324,11 +329,12 @@ var _ = Describe("gplan", func() {
 			})
 		})
 
-		Context("Revisión el siguiente día de comienzo de proyecto sin ningún avance en ninguna tarea", func() {
+		When("Revisión el siguiente día de comienzo de proyecto sin ningún avance en ninguna tarea", func() {
 
 			It("El avance debe ser que hay retraso:", func() {
 				err := gplan.Review(plan, parseDate("2021-06-08"))
 				Expect(err).Should(BeNil())
+				Expect(plan.CompleteTasks).Should(BeEquivalentTo(0))
 				Expect(plan.ExpectedProgress).Should(Equal(uint(4)))
 				Expect(plan.RealProgress).Should(BeZero())
 				Expect(plan.RealProgressDays).Should(Equal(1.2))
@@ -336,12 +342,13 @@ var _ = Describe("gplan", func() {
 			})
 		})
 
-		Context("Revisión día 2021-06-17 con la 'tarea 1' completada", func() {
+		When("Revisión día 2021-06-17 con la 'tarea 1' completada", func() {
 
 			It("El avance debe ser que hay retraso:", func() {
 				plan.Tasks[2].RealProgress = 100
 				err := gplan.Review(plan, parseDate("2021-06-17"))
 				Expect(err).Should(BeNil())
+				Expect(plan.CompleteTasks).Should(BeEquivalentTo(1))
 				Expect(plan.ExpectedProgress).Should(Equal(uint(24)))
 				Expect(plan.RealProgress).Should(Equal(uint(20)))
 				Expect(plan.RealProgressDays).Should(Equal(1.2))
@@ -349,7 +356,7 @@ var _ = Describe("gplan", func() {
 			})
 		})
 
-		Context("Revisión día 2021-07-01 con diferentes porcentajes completados", func() {
+		When("Revisión día 2021-07-01 con diferentes porcentajes completados", func() {
 
 			It("El avance debe ser que hay retraso:", func() {
 				plan.Tasks[0].RealProgress = 100
@@ -361,6 +368,7 @@ var _ = Describe("gplan", func() {
 
 				err := gplan.Review(plan, parseDate("2021-07-01"))
 				Expect(err).Should(BeNil())
+				Expect(plan.CompleteTasks).Should(BeEquivalentTo(3))
 				Expect(plan.ExpectedProgress).Should(Equal(uint(69)))
 				Expect(plan.RealProgress).Should(Equal(uint(61)))
 				Expect(plan.RealProgressDays).Should(Equal(2.4))
@@ -368,7 +376,7 @@ var _ = Describe("gplan", func() {
 			})
 		})
 
-		Context("Revisión día 2021-07-01 con avances significativos", func() {
+		When("Revisión día 2021-07-01 con avances significativos", func() {
 
 			It("El avance debe ser que hay adelanto:", func() {
 				plan.Tasks[0].RealProgress = 100
@@ -380,6 +388,7 @@ var _ = Describe("gplan", func() {
 
 				err := gplan.Review(plan, parseDate("2021-07-01"))
 				Expect(err).Should(BeNil())
+				Expect(plan.CompleteTasks).Should(BeEquivalentTo(4))
 				Expect(plan.ExpectedProgress).Should(Equal(uint(69)))
 				Expect(plan.RealProgress).Should(Equal(uint(79)))
 				Expect(plan.RealProgressDays).Should(Equal(-3.0))
@@ -387,7 +396,7 @@ var _ = Describe("gplan", func() {
 			})
 		})
 
-		Context("Revisión día 2021-07-01 con todo completado el 2021-07-01", func() {
+		When("Revisión día 2021-07-01 con todo completado el 2021-07-01", func() {
 
 			It("El avance debe ser una gran adelanto:", func() {
 				for _, task := range plan.Tasks {
@@ -400,6 +409,7 @@ var _ = Describe("gplan", func() {
 
 				err := gplan.Review(plan, parseDate("2021-07-01"))
 				Expect(err).Should(BeNil())
+				Expect(plan.CompleteTasks).Should(BeEquivalentTo(6))
 				Expect(plan.ExpectedProgress).Should(Equal(uint(69)))
 				Expect(plan.RealProgress).Should(Equal(uint(100)))
 				Expect(plan.RealProgressDays).Should(Equal(-14.0))
@@ -407,7 +417,7 @@ var _ = Describe("gplan", func() {
 			})
 		})
 
-		Context("Revisión día 2021-07-21 con todo completado en la fecha planificada", func() {
+		When("Revisión día 2021-07-21 con todo completado en la fecha planificada", func() {
 
 			It("El avance debe ser completado sin retraso:", func() {
 
@@ -418,6 +428,7 @@ var _ = Describe("gplan", func() {
 
 				err := gplan.Review(plan, parseDate("2021-07-21"))
 				Expect(err).Should(BeNil())
+				Expect(plan.CompleteTasks).Should(BeEquivalentTo(6))
 				Expect(plan.ExpectedProgress).Should(Equal(uint(100)))
 				Expect(plan.RealProgress).Should(Equal(uint(100)))
 				Expect(plan.RealProgressDays).Should(Equal(0.0))
@@ -425,7 +436,7 @@ var _ = Describe("gplan", func() {
 			})
 		})
 
-		Context("Revisión día 2021-07-26 con todo completado en la fecha planificada", func() {
+		When("Revisión día 2021-07-26 con todo completado en la fecha planificada", func() {
 
 			It("El avance debe ser ser completado sin retraso:", func() {
 
@@ -436,6 +447,7 @@ var _ = Describe("gplan", func() {
 
 				err := gplan.Review(plan, parseDate("2021-07-26"))
 				Expect(err).Should(BeNil())
+				Expect(plan.CompleteTasks).Should(BeEquivalentTo(6))
 				Expect(plan.ExpectedProgress).Should(Equal(uint(100)))
 				Expect(plan.RealProgress).Should(Equal(uint(100)))
 				Expect(plan.RealProgressDays).Should(Equal(0.0))
@@ -443,7 +455,7 @@ var _ = Describe("gplan", func() {
 			})
 		})
 
-		Context("Revisión día 2021-07-21 on diferentes porcentajes completados", func() {
+		When("Revisión día 2021-07-21 on diferentes porcentajes completados", func() {
 
 			It("El avance debe ser un gran retraso:", func() {
 
@@ -462,6 +474,7 @@ var _ = Describe("gplan", func() {
 
 				err := gplan.Review(plan, parseDate("2021-07-26"))
 				Expect(err).Should(BeNil())
+				Expect(plan.CompleteTasks).Should(BeEquivalentTo(3))
 				Expect(plan.ExpectedProgress).Should(Equal(uint(100)))
 				Expect(plan.RealProgress).Should(Equal(uint(61)))
 				Expect(plan.RealProgressDays).Should(Equal(12.7))
@@ -469,7 +482,7 @@ var _ = Describe("gplan", func() {
 			})
 		})
 
-		Context("Revisión día 2021-07-30 con todo completado el día 2021-07-26:", func() {
+		When("Revisión día 2021-07-30 con todo completado el día 2021-07-26:", func() {
 
 			It("El avance debe ser completado con retraso:", func() {
 
@@ -481,6 +494,7 @@ var _ = Describe("gplan", func() {
 
 				err := gplan.Review(plan, parseDate("2021-07-30"))
 				Expect(err).Should(BeNil())
+				Expect(plan.CompleteTasks).Should(BeEquivalentTo(6))
 				Expect(plan.ExpectedProgress).Should(Equal(uint(100)))
 				Expect(plan.RealProgress).Should(Equal(uint(100)))
 				Expect(plan.RealProgressDays).Should(Equal(2.0))
