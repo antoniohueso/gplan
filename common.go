@@ -8,7 +8,7 @@ import (
 )
 
 // CalculateLaborableDate devuelve una fecha laborable a partir de una fecha sumando o restando los días que recibe como parámetro.
-func CalculateLaborableDate(from time.Time, days int, holidays []IHolidays) time.Time {
+func CalculateLaborableDate(from time.Time, days int, holidays []Holidays) time.Time {
 
 	from = from.Local()
 
@@ -34,7 +34,7 @@ func CalculateLaborableDate(from time.Time, days int, holidays []IHolidays) time
 }
 
 // CalculateLaborableDays Devuelve los días laborables que hay entre dos fechas, incluidas ambas.
-func CalculateLaborableDays(from time.Time, to time.Time, holidays []IHolidays) uint {
+func CalculateLaborableDays(from time.Time, to time.Time, holidays []Holidays) uint {
 	var days uint
 	date := from
 	for dateutil.IsLte(date, to) {
@@ -47,7 +47,7 @@ func CalculateLaborableDays(from time.Time, to time.Time, holidays []IHolidays) 
 }
 
 // IsLaborableDay devuelve True si el día que recibe como parámetro es laborable
-func IsLaborableDay(day time.Time, feastDays []IHolidays) bool {
+func IsLaborableDay(day time.Time, feastDays []Holidays) bool {
 
 	// Si el día que recibimos es sábado o domingo devuelve False
 	if day.Weekday() == time.Saturday || day.Weekday() == time.Sunday {
@@ -56,7 +56,7 @@ func IsLaborableDay(day time.Time, feastDays []IHolidays) bool {
 
 	// Si el día que recibimos está entre los rangos de vacaciones o días de fiesta devuelve False
 	for _, h := range feastDays {
-		if dateutil.IsBetween(day, h.Base().From, h.Base().To) {
+		if dateutil.IsBetween(day, h.GetFrom(), h.GetTo()) {
 			return false
 		}
 	}

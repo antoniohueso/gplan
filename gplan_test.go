@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/antoniohueso/gplan"
-	. "github.com/antoniohueso/gplan/sample"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

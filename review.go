@@ -8,13 +8,11 @@ import (
 )
 
 // Review actualiza el estado de avance de una planificación a fecha de reviewDate
-func Review(plan IProjectPlan, reviewDate time.Time) *Error {
-
-	var planBase *ProjectPlanBase = plan.Base()
+func Review(plan ProjectPlan, reviewDate time.Time) *Error {
 
 	var (
-		tasks     []ITask     = plan.GetTasks()
-		feastDays []IHolidays = plan.GetFeastDays()
+		tasks     = plan.GetTasks()
+		feastDays = plan.GetFeastDays()
 	)
 
 	// Si el plan no está planificado aun retorna error
@@ -25,41 +23,42 @@ func Review(plan IProjectPlan, reviewDate time.Time) *Error {
 	}
 
 	// Calcula el avance estimado
-	planBase.ExpectedProgress = CalculateExpectedProgress(
+	plan.SetExpectedProgress(CalculateExpectedProgress(
 		tasks,
 		feastDays,
-		reviewDate)
+		reviewDate))
 
 	// Calcula el avance real
-	planBase.RealProgress = CalculateRealProgress(tasks)
+	plan.SetRealProgress(CalculateRealProgress(tasks))
 
 	// Si el plan está al 100% calcula la fecha de finalización real mayor para ponerla como fecha final real del proyecto
 	// Y calcular el retraso o adelanto
 	var lastResolvedDate time.Time
-	if planBase.RealProgress == 100 || planBase.IsArchived {
+	if plan.GetRealProgress() == 100 || plan.IsArchived() {
 		for _, task := range tasks {
-			if dateutil.IsGt(task.Base().RealEndDate, lastResolvedDate) {
-				lastResolvedDate = task.Base().RealEndDate
+			if dateutil.IsGt(task.GetRealEndDate(), lastResolvedDate) {
+				lastResolvedDate = task.GetRealEndDate()
 			}
 		}
 	}
 
-	realProgressDays := calculateProgressDays(
+	var realProgressDays = calculateProgressDays(
 		reviewDate,
-		planBase.ExpectedProgress,
-		planBase.RealProgress,
-		planBase.StartDate,
-		planBase.EndDate,
+		plan.GetExpectedProgress(),
+		plan.GetRealProgress(),
+		plan.GetStartDate(),
+		plan.GetEndDate(),
 		lastResolvedDate,
 		feastDays)
 
 	// Calcula el avance o retraso en la planificación en días
-	planBase.RealProgressDays = math.Round(realProgressDays*100) / 100
+	plan.SetRealProgressDays(math.Round(realProgressDays*100) / 100)
 
 	// Calcula el avance o el retraso en función de Avance o retraso en días y teniendo en cuenta los días de fiesta
 	// Redondea a la alta los días de retraso y a la baja los de adelanto de manera que si es -1.2 será -1 y si es 1.2 será 2.
 	// Es decir 1.3 días de adelanto para gplan será un día de adelanto y 1.3 días de retraso serán 2 días
-	planBase.EstimatedEndDate = CalculateLaborableDate(planBase.EndDate, int(math.Ceil(planBase.RealProgressDays)), feastDays)
+	plan.SetEstimatedEndDate(
+		CalculateLaborableDate(plan.GetEndDate(), int(math.Ceil(plan.GetRealProgressDays())), feastDays))
 
 	return nil
 }
@@ -68,32 +67,32 @@ func Review(plan IProjectPlan, reviewDate time.Time) *Error {
 // Sigue la programación de las tareas de manera que si currDate > que la fecha de fin de la tarea esta se considera como que debería
 // estar completa al 100% y si currDate es < startDate entonces se considera que debería estar al 0%. Si currDate está entre
 // startDate y endDate de una tarea calcula el % que debería llevar hasta el día actual.
-func CalculateExpectedProgress(tasks []ITask, feastDays []IHolidays, currDate time.Time) uint {
+func CalculateExpectedProgress(tasks []Task, feastDays []Holidays, currDate time.Time) uint {
 
 	var estimatedAdvanced uint
 	var totalDuration uint
 
 	for _, task := range tasks {
 
-		totalDuration += task.Base().Duration
+		totalDuration += task.GetDuration()
 
 		// Está en el intervalo de fecha de comienzo y final de la tarea, calcula el avance estimado
-		if dateutil.IsBetween(currDate, task.Base().StartDate, task.Base().EndDate) {
-			var holidaysAndFeastDays []IHolidays
+		if dateutil.IsBetween(currDate, task.GetStartDate(), task.GetEndDate()) {
+			var holidaysAndFeastDays []Holidays
 			// concatena días de fiesta y vacaciones del recurso
 			holidaysAndFeastDays = append(holidaysAndFeastDays, task.GetResource().GetHolidays()...)
 			holidaysAndFeastDays = append(holidaysAndFeastDays, feastDays...)
 
-			currDays := CalculateLaborableDays(task.Base().StartDate, currDate.AddDate(0, 0, -1), holidaysAndFeastDays)
+			currDays := CalculateLaborableDays(task.GetStartDate(), currDate.AddDate(0, 0, -1), holidaysAndFeastDays)
 			estimatedAdvanced += currDays
-			task.Base().ExpectedProgress = (currDays * 100) / task.Base().Duration
-		} else if dateutil.IsGt(currDate, task.Base().EndDate) {
+			task.SetExpectedProgress((currDays * 100) / task.GetDuration())
+		} else if dateutil.IsGt(currDate, task.GetEndDate()) {
 			// Se ha pasado de la fecha fin, debería estar al 100%
-			task.Base().ExpectedProgress = 100
-			estimatedAdvanced += task.Base().Duration
+			task.SetExpectedProgress(100)
+			estimatedAdvanced += task.GetDuration()
 		} else {
 			// Es menor que la fecha de comienzo, debería estar al 0%
-			task.Base().ExpectedProgress = 0
+			task.SetExpectedProgress(0)
 		}
 	}
 
@@ -105,14 +104,14 @@ func CalculateExpectedProgress(tasks []ITask, feastDays []IHolidays, currDate ti
 
 // CalculateRealProgress Calcula el % de avance real sumando la duración completada realmente y sacando el % con respecto de la suma
 // de todas las duraciones.
-func CalculateRealProgress(tasks []ITask) uint {
+func CalculateRealProgress(tasks []Task) uint {
 
 	var totalCompleteXDuration uint
 	var totalDuration uint
 
 	for _, task := range tasks {
-		totalCompleteXDuration += task.Base().RealProgress * task.Base().Duration
-		totalDuration += task.Base().Duration
+		totalCompleteXDuration += task.GetRealProgress() * task.GetDuration()
+		totalDuration += task.GetDuration()
 	}
 
 	return totalCompleteXDuration / totalDuration
@@ -127,9 +126,9 @@ func calculateProgressDays(
 	startDate time.Time,
 	endDate time.Time,
 	lastResolvedDate time.Time,
-	feastDays []IHolidays) float64 {
+	feastDays []Holidays) float64 {
 
-	var result float64 = 0.0
+	var result float64
 
 	// Si la planificación se ha completado
 	if realCompleted == 100 {
