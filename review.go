@@ -105,8 +105,8 @@ func CalculateExpectedProgress(tasks []Task, feastDays []Holidays, currDate time
 	return (estimatedAdvanced * 100) / totalDuration
 }
 
-// CalculateRealProgress Calcula el % de avance real sumando la duración completada realmente y sacando el % con respecto de la suma
-// de todas las duraciones.
+// CalculateRealProgress Calcula el % de avance real con la siguiente fórmula:
+// [Suma el resultado de multiplicar % real de cada tarea * su duración y el resultado lo divide por el total de la duración]
 func CalculateRealProgress(tasks []Task) uint {
 
 	var totalCompleteXDuration uint
