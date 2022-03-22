@@ -244,7 +244,8 @@ func assignTask(task Task, resources []Resource, feastDays []Holidays, tasksInde
 	// Le asigna los datos de la planificación
 	scheduledTaskInfo = bestScheduledTask(task, resources, feastDays)
 
-	task.SetResource(scheduledTaskInfo.Resource)
+	var resourceID = scheduledTaskInfo.Resource.GetID()
+	task.SetResourceID(&resourceID)
 	task.SetStartDate(scheduledTaskInfo.StartDate)
 	task.SetEndDate(scheduledTaskInfo.EndDate)
 
@@ -270,7 +271,7 @@ func getRealStartDate(task Task, tasksIndex map[TaskID]Task) (time.Time, *Error)
 
 		taskBlocksBy := tasksIndex[dep.GetTaskID()]
 
-		if taskBlocksBy.GetResource() == nil {
+		if taskBlocksBy.GetResourceID() == nil {
 			// Esto debería ser muy improbable que se dé si el código funciona como debe...
 			return time.Time{}, newTextError("La tarea %s no está planificada y bloquea a la tarea %s que está en planificación",
 				dep.GetTaskID(), task.GetID())

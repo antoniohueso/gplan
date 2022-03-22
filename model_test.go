@@ -148,7 +148,7 @@ type Task struct {
 	// Fecha real de finalización
 	RealEndDate time.Time `json:"realEndDate"`
 	// Recurso asignado
-	Resource *Resource
+	ResourceID *gplan.ResourceID
 	// IDs de las tareas a las que bloquea esta tarea
 	BlocksTo []*TaskDependency
 	// IDs de las tareas que bloquean a esta tarea
@@ -268,12 +268,12 @@ func (s *Task) SetExpectedProgress(n uint) {
 	s.ExpectedProgress = n
 }
 
-func (s *Task) GetResource() gplan.Resource {
-	return s.Resource
+func (s *Task) GetResourceID() *gplan.ResourceID {
+	return s.ResourceID
 }
 
-func (s *Task) SetResource(r gplan.Resource) {
-	s.Resource = r.(*Resource)
+func (s *Task) SetResourceID(r *gplan.ResourceID) {
+	s.ResourceID = r
 }
 
 func (s *Task) GetBlocksTo() []gplan.TaskDependency {

@@ -513,7 +513,7 @@ func printPlan(plan *ProjectPlan) {
 	fmt.Println()
 	for _, task := range plan.Tasks {
 		fmt.Printf("%s|%02d|%02d|%s|%s|%s\n", task.ID, task.Order, task.Duration, task.StartDate.Format("2006-01-02"), task.EndDate.Format("2006-01-02"),
-			task.Resource.ID)
+			*task.ResourceID)
 	}
 }
 
@@ -522,7 +522,7 @@ func comparePlan(tasks []*Task, compare []string) {
 
 	for i := range tasks {
 		s := fmt.Sprintf("%s %s %s", tasks[i].StartDate.Format("2006-01-02"), tasks[i].EndDate.Format("2006-01-02"),
-			tasks[i].Resource.ID)
+			*tasks[i].ResourceID)
 		sTasks = append(sTasks, s)
 		//log.Println(s)
 	}

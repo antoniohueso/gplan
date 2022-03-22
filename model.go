@@ -68,8 +68,8 @@ type Task interface {
 	GetRealEndDate() time.Time
 	SetRealEndDate(time.Time)
 	// Recurso asignado
-	GetResource() Resource
-	SetResource(Resource)
+	GetResourceID() *ResourceID
+	SetResourceID(*ResourceID)
 	// IDs de las tareas a las que bloquea esta tarea
 	GetBlocksTo() []TaskDependency
 	// IDs de las tareas que bloquean a esta tarea

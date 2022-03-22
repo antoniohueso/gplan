@@ -11,21 +11,28 @@ import (
 func Review(plan ProjectPlan, reviewDate time.Time) *Error {
 
 	var (
-		tasks     = plan.GetTasks()
-		feastDays = plan.GetFeastDays()
+		tasks        = plan.GetTasks()
+		feastDays    = plan.GetFeastDays()
+		resourcesIdx = make(map[ResourceID]Resource)
 	)
 
 	// Si el plan no está planificado aun retorna error
 	for _, task := range tasks {
-		if task.GetResource() == nil {
+		if task.GetResourceID() == nil {
 			return newTextError("Hay tareas sin planificar aun")
 		}
+	}
+
+	// Crea el índice de recursos
+	for _, r := range plan.GetResources() {
+		resourcesIdx[r.GetID()] = r
 	}
 
 	// Calcula el avance estimado
 	plan.SetExpectedProgress(CalculateExpectedProgress(
 		tasks,
 		feastDays,
+		resourcesIdx,
 		reviewDate))
 
 	// Calcula el avance real
@@ -70,7 +77,7 @@ func Review(plan ProjectPlan, reviewDate time.Time) *Error {
 // Sigue la programación de las tareas de manera que si currDate > que la fecha de fin de la tarea esta se considera como que debería
 // estar completa al 100% y si currDate es < startDate entonces se considera que debería estar al 0%. Si currDate está entre
 // startDate y endDate de una tarea calcula el % que debería llevar hasta el día actual.
-func CalculateExpectedProgress(tasks []Task, feastDays []Holidays, currDate time.Time) uint {
+func CalculateExpectedProgress(tasks []Task, feastDays []Holidays, resourceIdx map[ResourceID]Resource, currDate time.Time) uint {
 
 	var estimatedAdvanced uint
 	var totalDuration uint
@@ -83,7 +90,8 @@ func CalculateExpectedProgress(tasks []Task, feastDays []Holidays, currDate time
 		if dateutil.IsBetween(currDate, task.GetStartDate(), task.GetEndDate()) {
 			var holidaysAndFeastDays []Holidays
 			// concatena días de fiesta y vacaciones del recurso
-			holidaysAndFeastDays = append(holidaysAndFeastDays, task.GetResource().GetHolidays()...)
+			var resource = resourceIdx[*task.GetResourceID()]
+			holidaysAndFeastDays = append(holidaysAndFeastDays, resource.GetHolidays()...)
 			holidaysAndFeastDays = append(holidaysAndFeastDays, feastDays...)
 
 			currDays := CalculateLaborableDays(task.GetStartDate(), currDate.AddDate(0, 0, -1), holidaysAndFeastDays)
