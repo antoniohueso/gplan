@@ -314,8 +314,9 @@ type ProjectPlan struct {
 	// Avance o retraso real en días
 	RealProgressDays float64 `json:"realProgressDays"`
 	// Fecha estimada de fin calculada en cada revisión en función de los días de avance o retraso y los días de fiesta
-	EstimatedEndDate time.Time `json:"estimatedEndDate"`
-	Workdays         uint      `json:"workDays"`
+	EstimatedEndDate  time.Time `json:"estimatedEndDate"`
+	Workdays          uint      `json:"workDays"`
+	WorkdaysToEndDate uint      `json:"workDaysToEndDate"`
 	// Tareas completadas
 	CompleteTasks uint `json:"completeTasks" bson:",omitempty"`
 	// Número Total de tareas
@@ -400,6 +401,14 @@ func (s *ProjectPlan) GetWorkdays() uint {
 
 func (s *ProjectPlan) SetWorkdays(n uint) {
 	s.Workdays = n
+}
+
+func (s *ProjectPlan) GetWorkdaysToEndDate() uint {
+	return s.WorkdaysToEndDate
+}
+
+func (s *ProjectPlan) SetWorkdaysToEndDate(n uint) {
+	s.WorkdaysToEndDate = n
 }
 
 func (s *ProjectPlan) GetTotalTasks() uint {

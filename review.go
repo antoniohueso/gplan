@@ -70,6 +70,8 @@ func Review(plan ProjectPlan, reviewDate time.Time) *Error {
 	// Calcula el total de tareas completadas
 	plan.SetCompleteTasks(CalculateTotalTasksCompleted(tasks))
 
+	plan.SetWorkdaysToEndDate(CalculateLaborableDays(time.Now(), plan.GetEndDate(), feastDays))
+
 	return nil
 }
 

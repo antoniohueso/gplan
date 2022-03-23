@@ -104,6 +104,9 @@ type ProjectPlan interface {
 	// Jornadas de trabajo que tiene la planificación
 	GetWorkdays() uint
 	SetWorkdays(uint)
+	// Jornadas de trabajo que quedan hasta la fecha de fin
+	GetWorkdaysToEndDate() uint
+	SetWorkdaysToEndDate(uint)
 	// Tareas completadas
 	GetCompleteTasks() uint
 	SetCompleteTasks(uint)
