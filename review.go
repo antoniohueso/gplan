@@ -81,7 +81,7 @@ func Review(plan ProjectPlan, reviewDate time.Time) *Error {
 // startDate y endDate de una tarea calcula el % que debería llevar hasta el día actual.
 func CalculateExpectedProgress(tasks []Task, feastDays []Holidays, resourceIdx map[ResourceID]Resource, currDate time.Time) uint {
 
-	var estimatedAdvanced uint
+	var expectedProgressDays uint
 	var totalDuration uint
 
 	for _, task := range tasks {
@@ -97,12 +97,12 @@ func CalculateExpectedProgress(tasks []Task, feastDays []Holidays, resourceIdx m
 			holidaysAndFeastDays = append(holidaysAndFeastDays, feastDays...)
 
 			currDays := CalculateLaborableDays(task.GetStartDate(), currDate.AddDate(0, 0, -1), holidaysAndFeastDays)
-			estimatedAdvanced += currDays
+			expectedProgressDays += currDays
 			task.SetExpectedProgress((currDays * 100) / task.GetDuration())
 		} else if dateutil.IsGt(currDate, task.GetEndDate()) {
 			// Se ha pasado de la fecha fin, debería estar al 100%
 			task.SetExpectedProgress(100)
-			estimatedAdvanced += task.GetDuration()
+			expectedProgressDays += task.GetDuration()
 		} else {
 			// Es menor que la fecha de comienzo, debería estar al 0%
 			task.SetExpectedProgress(0)
@@ -112,7 +112,7 @@ func CalculateExpectedProgress(tasks []Task, feastDays []Holidays, resourceIdx m
 	// Se suman las duraciones que deberían estar completas o a medio completar y se calcula el % con respecto al
 	// total de la duración
 	// TODO: Esto lo calcula siempre a la baja,probar algún dia a redondear normalmente con math.Round(valor)
-	return (estimatedAdvanced * 100) / totalDuration
+	return (expectedProgressDays * 100) / totalDuration
 }
 
 // CalculateRealProgress Calcula el % de avance real con la siguiente fórmula:
