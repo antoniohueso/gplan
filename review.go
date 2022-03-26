@@ -79,7 +79,7 @@ func Review(plan ProjectPlan, reviewDate time.Time) *Error {
 // Sigue la programación de las tareas de manera que si currDate > que la fecha de fin de la tarea esta se considera como que debería
 // estar completa al 100% y si currDate es < startDate entonces se considera que debería estar al 0%. Si currDate está entre
 // startDate y endDate de una tarea calcula el % que debería llevar hasta el día actual.
-func CalculateExpectedProgress(tasks []Task, feastDays []Holidays, resourceIdx map[ResourceID]Resource, currDate time.Time) uint {
+func CalculateExpectedProgress(tasks []Task, feastDays []Holidays, resourceIdx map[ResourceID]Resource, dateReview time.Time) uint {
 
 	var expectedProgressDays uint
 	var totalDuration uint
@@ -88,24 +88,27 @@ func CalculateExpectedProgress(tasks []Task, feastDays []Holidays, resourceIdx m
 
 		totalDuration += task.GetDuration()
 
-		// Está en el intervalo de fecha de comienzo y final de la tarea, calcula el avance estimado
-		if dateutil.IsBetween(currDate, task.GetStartDate(), task.GetEndDate()) {
+		if dateutil.IsLt(dateReview, task.GetStartDate()) {
+			// Si la fecha de revisión es < que la fecha de comienzo
+			// Es menor que la fecha de comienzo, debería estar al 0%
+			task.SetExpectedProgress(0)
+		} else if dateutil.IsGt(dateReview, task.GetEndDate()) {
+			// Si la fecha de revisión es > que la fecha de fin
+			// Se ha pasado de la fecha fin, debería estar al 100%
+			task.SetExpectedProgress(100)
+			expectedProgressDays += task.GetDuration()
+		} else {
+			// Si la fecha de revisión está entre la fecha de inicio y la de fin de la tarea, calcula el progreso esperado en base a la duración
+			// que debería llevar
 			var holidaysAndFeastDays []Holidays
 			// concatena días de fiesta y vacaciones del recurso
 			var resource = resourceIdx[*task.GetResourceID()]
 			holidaysAndFeastDays = append(holidaysAndFeastDays, resource.GetHolidays()...)
 			holidaysAndFeastDays = append(holidaysAndFeastDays, feastDays...)
 
-			currDays := CalculateLaborableDays(task.GetStartDate(), currDate.AddDate(0, 0, -1), holidaysAndFeastDays)
+			currDays := CalculateLaborableDays(task.GetStartDate(), dateReview.AddDate(0, 0, -1), holidaysAndFeastDays)
 			expectedProgressDays += currDays
 			task.SetExpectedProgress((currDays * 100) / task.GetDuration())
-		} else if dateutil.IsGt(currDate, task.GetEndDate()) {
-			// Se ha pasado de la fecha fin, debería estar al 100%
-			task.SetExpectedProgress(100)
-			expectedProgressDays += task.GetDuration()
-		} else {
-			// Es menor que la fecha de comienzo, debería estar al 0%
-			task.SetExpectedProgress(0)
 		}
 	}
 
