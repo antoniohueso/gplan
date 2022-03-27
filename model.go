@@ -61,12 +61,15 @@ type Task interface {
 	// Porcentaje real completado
 	GetRealProgress() uint
 	SetRealProgress(uint)
-	// Porcentaje completado según lo planificado
+	// Duración real completada
+	GetRealCompleteDuration() uint
+	SetRealCompleteDuration(uint)
+	// Porcentaje completado esperada según lo planificado
 	GetExpectedProgress() uint
 	SetExpectedProgress(uint)
-	// Fecha real de finalización
-	GetRealEndDate() time.Time
-	SetRealEndDate(time.Time)
+	// Duración completada esperada según lo planificado
+	GetExpectedCompleteDuration() uint
+	SetExpectedCompleteDuration(uint)
 	// Recurso asignado
 	GetResourceID() *ResourceID
 	SetResourceID(*ResourceID)

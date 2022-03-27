@@ -143,8 +143,12 @@ type Task struct {
 	EndDate time.Time `json:"endDate"`
 	// Porcentaje real completado
 	RealProgress uint `json:"realProgress"`
+	// Duración real completada
+	RealCompleteDuration uint `json:"realCompleteDuration"`
 	// Porcentaje completado según lo planificado
 	ExpectedProgress uint `json:"expectedProgress"`
+	// Duración esperada completada
+	ExpectedCompleteDuration uint `json:"expectedCompleteDuration"`
 	// Fecha real de finalización
 	RealEndDate time.Time `json:"realEndDate"`
 	// Recurso asignado
@@ -260,12 +264,28 @@ func (s *Task) SetRealProgress(n uint) {
 	s.RealProgress = n
 }
 
+func (s *Task) GetRealCompleteDuration() uint {
+	return s.RealCompleteDuration
+}
+
+func (s *Task) SetRealCompleteDuration(n uint) {
+	s.RealCompleteDuration = n
+}
+
 func (s *Task) GetExpectedProgress() uint {
 	return s.ExpectedProgress
 }
 
 func (s *Task) SetExpectedProgress(n uint) {
 	s.ExpectedProgress = n
+}
+
+func (s *Task) GetExpectedCompleteDuration() uint {
+	return s.ExpectedCompleteDuration
+}
+
+func (s *Task) SetExpectedCompleteDuration(n uint) {
+	s.ExpectedCompleteDuration = n
 }
 
 func (s *Task) GetResourceID() *gplan.ResourceID {
