@@ -394,7 +394,7 @@ var _ = Describe("gplan", func() {
 				Expect(plan.CompleteTasks).Should(BeEquivalentTo(4))
 				Expect(plan.ExpectedProgress).Should(Equal(uint(69)))
 				Expect(plan.RealProgress).Should(Equal(uint(79)))
-				Expect(plan.RealProgressDays).Should(Equal(-3.0))
+				Expect(plan.RealProgressDays).Should(Equal(-3.1))
 				Expect(plan.EstimatedEndDate).Should(Equal(parseDate("2021-07-15")))
 			})
 		})
