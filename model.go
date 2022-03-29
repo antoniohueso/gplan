@@ -58,6 +58,9 @@ type Task interface {
 	// Fecha planificada de fin de la tarea
 	GetEndDate() time.Time
 	SetEndDate(time.Time)
+	// Fecha real de finalización
+	GetRealEndDate() time.Time
+	SetRealEndDate(time.Time)
 	// Porcentaje real completado
 	GetRealProgress() uint
 	SetRealProgress(uint)

@@ -416,7 +416,7 @@ var _ = Describe("gplan", func() {
 				Expect(plan.ExpectedProgress).Should(Equal(uint(69)))
 				Expect(plan.RealProgress).Should(Equal(uint(100)))
 				Expect(plan.RealProgressDays).Should(Equal(-14.0))
-				Expect(plan.EstimatedEndDate).Should(Equal(parseDate("2021-06-30")))
+				Expect(plan.EstimatedEndDate).Should(Equal(parseDate("2021-07-01")))
 			})
 		})
 
@@ -458,7 +458,7 @@ var _ = Describe("gplan", func() {
 			})
 		})
 
-		When("Revisión día 2021-07-21 on diferentes porcentajes completados", func() {
+		When("Revisión día 2021-07-26 con diferentes porcentajes completados", func() {
 
 			It("El avance debe ser un gran retraso:", func() {
 
@@ -480,7 +480,7 @@ var _ = Describe("gplan", func() {
 				Expect(plan.CompleteTasks).Should(BeEquivalentTo(3))
 				Expect(plan.ExpectedProgress).Should(Equal(uint(100)))
 				Expect(plan.RealProgress).Should(Equal(uint(61)))
-				Expect(plan.RealProgressDays).Should(Equal(12.7))
+				Expect(plan.RealProgressDays).Should(Equal(12.6))
 				Expect(plan.EstimatedEndDate).Should(Equal(parseDate("2021-08-10")))
 			})
 		})
