@@ -336,6 +336,7 @@ type ProjectPlan struct {
 	// Fecha estimada de fin calculada en cada revisión en función de los días de avance o retraso y los días de fiesta
 	EstimatedEndDate  time.Time `json:"estimatedEndDate"`
 	Workdays          uint      `json:"workDays"`
+	TotalDuration     uint      `json:"totalDuration"`
 	WorkdaysToEndDate uint      `json:"workDaysToEndDate"`
 	// Tareas completadas
 	CompleteTasks uint `json:"completeTasks" bson:",omitempty"`
@@ -421,6 +422,14 @@ func (s *ProjectPlan) GetWorkdays() uint {
 
 func (s *ProjectPlan) SetWorkdays(n uint) {
 	s.Workdays = n
+}
+
+func (s *ProjectPlan) GetTotalDuration() uint {
+	return s.TotalDuration
+}
+
+func (s *ProjectPlan) SetTotalDuration(n uint) {
+	s.TotalDuration = n
 }
 
 func (s *ProjectPlan) GetWorkdaysToEndDate() uint {

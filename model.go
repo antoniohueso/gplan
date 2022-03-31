@@ -107,6 +107,9 @@ type ProjectPlan interface {
 	// Fecha estimada de fin calculada en cada revisión en función de los días de avance o retraso y los días de fiesta
 	GetEstimatedEndDate() time.Time
 	SetEstimatedEndDate(time.Time)
+	// Duración total
+	GetTotalDuration() uint
+	SetTotalDuration(uint)
 	// Jornadas de trabajo que tiene la planificación
 	GetWorkdays() uint
 	SetWorkdays(uint)

@@ -50,9 +50,13 @@ func Planning(startDate time.Time, plan ProjectPlan) *Error {
 	plan.SetStartDate(tasks[0].GetStartDate())
 	plan.SetEndDate(tasks[0].GetEndDate())
 
+	var totalDuration uint
+
 	// Busca la fecha de comienzo y de fin del proyecto que será la menor fecha de inicio de una tarea y la mayor
 	// fecha de fin del proyecto
+	// También calcula la duración total
 	for _, task := range tasks {
+		totalDuration += task.GetDuration()
 		if dateutil.IsLt(task.GetStartDate(), plan.GetStartDate()) {
 			plan.SetStartDate(task.GetStartDate())
 		}
@@ -63,6 +67,7 @@ func Planning(startDate time.Time, plan ProjectPlan) *Error {
 
 	plan.SetWorkdays(CalculateLaborableDays(plan.GetStartDate(), plan.GetEndDate(), feastDays))
 	plan.SetTotalTasks(uint(len(tasks)))
+	plan.SetTotalDuration(totalDuration)
 
 	return nil
 }

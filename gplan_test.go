@@ -248,6 +248,7 @@ var _ = Describe("gplan", func() {
 				Expect(plan.EndDate.Format("2006-01-02")).Should(Equal("2021-07-06"))
 				Expect(plan.Workdays).Should(BeEquivalentTo(20))
 				Expect(plan.TotalTasks).Should(BeEquivalentTo(6))
+				Expect(plan.TotalDuration).Should(BeEquivalentTo(49))
 			})
 		})
 
@@ -284,6 +285,7 @@ var _ = Describe("gplan", func() {
 				Expect(plan.EndDate.Format("2006-01-02")).Should(Equal("2021-07-20"))
 				Expect(plan.Workdays).Should(BeEquivalentTo(30))
 				Expect(plan.TotalTasks).Should(BeEquivalentTo(6))
+				Expect(plan.TotalDuration).Should(BeEquivalentTo(49))
 			})
 		})
 
