@@ -1,16 +1,37 @@
 package main
 
-import (
-	"fmt"
-	"time"
+type Task struct {
+	Name string
+	Age  int
+}
 
-	"github.com/antoniohueso/gplan"
-)
+type Project struct {
+	TotalTask int
+	Tasks     []*Task
+}
 
 func main() {
 
-	fechaUTC := time.Date(2022, 3, 10, 00, 00, 0, 0, time.Local).UTC()
+	var project = &Project{
+		TotalTask: 10,
+		Tasks: []*Task{
+			&Task{Name: "Antoño", Age: 10},
+			&Task{Name: "Antoño1", Age: 11},
+			&Task{Name: "Antoño2", Age: 12},
+		},
+	}
 
-	fmt.Printf("%d\n", gplan.CalculateLaborableDays(time.Now(), fechaUTC, nil))
+	var p = *project
+	var tasks []*Task
+	for _, t := range p.Tasks {
+		var tt = *t
+		tasks = append(tasks, &tt)
+	}
+	p.Tasks = tasks
 
+	p.TotalTask = 2
+	p.Tasks[0].Name = "Pollas"
+
+	println(p.TotalTask, " ", project.TotalTask)
+	println(p.Tasks[0].Name, " ", project.Tasks[0].Name)
 }

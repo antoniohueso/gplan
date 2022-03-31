@@ -48,7 +48,6 @@ func Review(plan ProjectPlan, reviewDate time.Time) *Error {
 func CalculateExpectedProgress(plan ProjectPlan, reviewDate time.Time) {
 	var (
 		expectedProgressDuration uint
-		totalDuration            uint
 		feastDays                = plan.GetFeastDays()
 		resourcesIdx             = make(map[ResourceID]Resource)
 	)
@@ -85,12 +84,11 @@ func CalculateExpectedProgress(plan ProjectPlan, reviewDate time.Time) {
 		}
 
 		expectedProgressDuration += task.GetExpectedCompleteDuration()
-		totalDuration += task.GetDuration()
 	}
 
 	// Se suman las duraciones que deberían estar completas o a medio completar y se calcula el % con respecto al
 	// total de la duración
-	plan.SetExpectedProgress((expectedProgressDuration * 100) / totalDuration)
+	plan.SetExpectedProgress((expectedProgressDuration * 100) / plan.GetTotalDuration())
 }
 
 // CalculateRealProgress Calcula el % de avance real
@@ -98,7 +96,6 @@ func CalculateRealProgress(plan ProjectPlan) {
 
 	var (
 		totalCompleteXDuration uint
-		totalDuration          uint
 	)
 
 	for _, task := range plan.GetTasks() {
@@ -106,10 +103,9 @@ func CalculateRealProgress(plan ProjectPlan) {
 		task.SetRealCompleteDuration((task.GetDuration() * task.GetRealProgress()) / 100)
 
 		totalCompleteXDuration += task.GetRealCompleteDuration()
-		totalDuration += task.GetDuration()
 	}
 
-	plan.SetRealProgress(totalCompleteXDuration * 100 / totalDuration)
+	plan.SetRealProgress(totalCompleteXDuration * 100 / plan.GetTotalDuration())
 }
 
 // CalculateProgressDays Calcula la los días de retraso o adelanto que llevamos, si es positivo el valor será retraso
@@ -121,7 +117,6 @@ func CalculateProgressDays(plan ProjectPlan, reviewDate time.Time) {
 		expectedCompleteDuration float64
 		realCompleteDuration     float64
 		realProgressDays         float64
-		totalDuration            float64
 		workDays                 = float64(plan.GetWorkdays())
 	)
 
@@ -158,11 +153,10 @@ func CalculateProgressDays(plan ProjectPlan, reviewDate time.Time) {
 		for _, task := range plan.GetTasks() {
 			expectedCompleteDuration += float64(task.GetExpectedCompleteDuration())
 			realCompleteDuration += float64(task.GetRealCompleteDuration())
-			totalDuration += float64(task.GetDuration())
 		}
 
 		// Fórmula (duración esperada - duración real) * las jornadas laborales del plan / duración total del plan
-		realProgressDays = ((expectedCompleteDuration - realCompleteDuration) * workDays) / totalDuration
+		realProgressDays = ((expectedCompleteDuration - realCompleteDuration) * workDays) / float64(plan.GetTotalDuration())
 
 		// Si la fecha de revisión -1  es > que la fecha de fin del plan, calcula los días que hay desde la fecha de finalización hasta la fecha de revisión -1
 		// y se los suma a los días
