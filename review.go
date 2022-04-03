@@ -38,6 +38,8 @@ func Review(plan ProjectPlan, reviewDate time.Time) *Error {
 
 	plan.SetWorkdaysToEndDate(CalculateLaborableDays(time.Now(), plan.GetEndDate(), feastDays))
 
+	plan.SetReviewDate(reviewDate)
+
 	return nil
 }
 

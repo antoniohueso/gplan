@@ -319,6 +319,7 @@ var _ = Describe("gplan", func() {
 			Expect(plan.EndDate.Format("2006-01-02")).Should(Equal("2021-07-20"))
 			Expect(plan.Workdays).Should(BeEquivalentTo(30))
 			Expect(plan.TotalTasks).Should(BeEquivalentTo(6))
+			Expect(plan.ReviewDate).Should(BeZero())
 		})
 
 		When("Revisamos el plan el día del inicio del proyecto", func() {
@@ -331,6 +332,7 @@ var _ = Describe("gplan", func() {
 				Expect(plan.RealProgress).Should(BeZero())
 				Expect(plan.RealProgressDays).Should(BeZero())
 				Expect(plan.EstimatedEndDate).Should(Equal(plan.EndDate))
+				Expect(plan.ReviewDate).Should(Equal(parseDate("2021-06-07")))
 			})
 		})
 
@@ -344,6 +346,7 @@ var _ = Describe("gplan", func() {
 				Expect(plan.RealProgress).Should(BeZero())
 				Expect(plan.RealProgressDays).Should(Equal(1.2))
 				Expect(plan.EstimatedEndDate).Should(Equal(parseDate("2021-07-26")))
+				Expect(plan.ReviewDate).Should(Equal(parseDate("2021-06-08")))
 			})
 		})
 
@@ -358,6 +361,7 @@ var _ = Describe("gplan", func() {
 				Expect(plan.RealProgress).Should(Equal(uint(20)))
 				Expect(plan.RealProgressDays).Should(Equal(1.2))
 				Expect(plan.EstimatedEndDate).Should(Equal(parseDate("2021-07-26")))
+				Expect(plan.ReviewDate).Should(Equal(parseDate("2021-06-17")))
 			})
 		})
 
@@ -378,6 +382,7 @@ var _ = Describe("gplan", func() {
 				Expect(plan.RealProgress).Should(Equal(uint(61)))
 				Expect(plan.RealProgressDays).Should(Equal(2.4))
 				Expect(plan.EstimatedEndDate).Should(Equal(parseDate("2021-07-27")))
+				Expect(plan.ReviewDate).Should(Equal(parseDate("2021-07-01")))
 			})
 		})
 
@@ -398,6 +403,7 @@ var _ = Describe("gplan", func() {
 				Expect(plan.RealProgress).Should(Equal(uint(79)))
 				Expect(plan.RealProgressDays).Should(Equal(-3.1))
 				Expect(plan.EstimatedEndDate).Should(Equal(parseDate("2021-07-15")))
+				Expect(plan.ReviewDate).Should(Equal(parseDate("2021-07-01")))
 			})
 		})
 
@@ -419,6 +425,7 @@ var _ = Describe("gplan", func() {
 				Expect(plan.RealProgress).Should(Equal(uint(100)))
 				Expect(plan.RealProgressDays).Should(Equal(-14.0))
 				Expect(plan.EstimatedEndDate).Should(Equal(parseDate("2021-07-01")))
+				Expect(plan.ReviewDate).Should(Equal(parseDate("2021-07-01")))
 			})
 		})
 
@@ -438,6 +445,7 @@ var _ = Describe("gplan", func() {
 				Expect(plan.RealProgress).Should(Equal(uint(100)))
 				Expect(plan.RealProgressDays).Should(Equal(0.0))
 				Expect(plan.EstimatedEndDate).Should(Equal(parseDate("2021-07-20")))
+				Expect(plan.ReviewDate).Should(Equal(parseDate("2021-07-21")))
 			})
 		})
 
@@ -457,6 +465,7 @@ var _ = Describe("gplan", func() {
 				Expect(plan.RealProgress).Should(Equal(uint(100)))
 				Expect(plan.RealProgressDays).Should(Equal(0.0))
 				Expect(plan.EstimatedEndDate).Should(Equal(parseDate("2021-07-20")))
+				Expect(plan.ReviewDate).Should(Equal(parseDate("2021-07-26")))
 			})
 		})
 
@@ -484,6 +493,7 @@ var _ = Describe("gplan", func() {
 				Expect(plan.RealProgress).Should(Equal(uint(61)))
 				Expect(plan.RealProgressDays).Should(Equal(12.6))
 				Expect(plan.EstimatedEndDate).Should(Equal(parseDate("2021-08-10")))
+				Expect(plan.ReviewDate).Should(Equal(parseDate("2021-07-26")))
 			})
 		})
 
@@ -504,6 +514,7 @@ var _ = Describe("gplan", func() {
 				Expect(plan.RealProgress).Should(Equal(uint(100)))
 				Expect(plan.RealProgressDays).Should(Equal(2.0))
 				Expect(plan.EstimatedEndDate).Should(Equal(parseDate("2021-07-26")))
+				Expect(plan.ReviewDate).Should(Equal(parseDate("2021-07-30")))
 			})
 		})
 

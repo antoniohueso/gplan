@@ -352,6 +352,8 @@ type ProjectPlan struct {
 	Resources []*Resource
 	// Festivos
 	FeastDays []*Holidays
+	// Fecha de revisión
+	ReviewDate time.Time
 }
 
 // NewProjectPlan crea un nuevo plan de proyecto para poder ser planificado o revisado
@@ -462,6 +464,14 @@ func (s *ProjectPlan) IsArchived() bool {
 
 func (s *ProjectPlan) GetArchivedDate() time.Time {
 	return s.ArchivedDate
+}
+
+func (s *ProjectPlan) GetReviewDate() time.Time {
+	return s.ReviewDate
+}
+
+func (s *ProjectPlan) SetReviewDate(date time.Time) {
+	s.ReviewDate = date
 }
 
 func (s *ProjectPlan) GetTasks() []gplan.Task {

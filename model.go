@@ -134,6 +134,9 @@ type ProjectPlan interface {
 	GetFeastDays() []Holidays
 	// Método que ordena las tareas por el campo Orden
 	SortTasksByOrder()
+	// Fecha de revisión del plan
+	GetReviewDate() time.Time
+	SetReviewDate(time.Time)
 }
 
 // scheduledTaskInfo datos de la planificación de una tarea
