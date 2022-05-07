@@ -13,7 +13,7 @@ func Planning(startDate time.Time, plan ProjectPlan) *Error {
 
 	log.Printf("F. Comienzo planificación %s\n", startDate)
 
-	// Hay que ordenarlas antes de que asihne las tareas ya que las extrae a otro array distinto
+	// Hay que ordenarlas antes de que asigne las tareas ya que las extrae a otro array distinto
 	plan.SortTasksByOrder()
 
 	var (
@@ -29,8 +29,8 @@ func Planning(startDate time.Time, plan ProjectPlan) *Error {
 		return err
 	}
 
-	// Si la fecha de disponibilidad ldel recurso es menor que la fecha en la que debe comenzar el proyecto sele pone la fecha en la que debe comenzar el proyecto
-	// para que no haya ninguna tarea que comeice antes
+	// Si la fecha de disponibilidad del recurso es menor que la fecha en la que debe comenzar el proyecto se le pone la fecha en la que debe comenzar el proyecto
+	// para que no haya ninguna tarea que comience antes
 	for _, resource := range resources {
 		if dateutil.IsLt(resource.GetNextAvailableDate(), startDate) {
 			resource.SetNextAvailableDate(startDate)

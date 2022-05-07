@@ -230,8 +230,15 @@ var _ = Describe("gplan", func() {
 					resources[1],
 				}
 
+				fInicioPlan, err2 := time.Parse("2006-01-02 15:04:05 -0700 MST", "2022-05-10 22:00:00 +0000 UTC")
+				if err2 != nil {
+					log.Fatalf("Error en parse %s", err2)
+				}
+
+				fmt.Println("INICIOOOO -> ", fInicioPlan.Local())
+
 				plan := NewProjectPlan("test-plan", tasks, resources, nil)
-				err := gplan.Planning(parseDate("2022-05-11"), plan)
+				err := gplan.Planning(fInicioPlan, plan)
 
 				Expect(err).Should(BeNil())
 
