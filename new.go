@@ -1,6 +1,7 @@
 package gplan
 
 import (
+	"log"
 	"sort"
 	"time"
 
@@ -9,6 +10,8 @@ import (
 
 // Planning Crea una nueva planificación a partir de unas tareas, recursos, vacaciones y fecha de comienzo.
 func Planning(startDate time.Time, plan ProjectPlan) *Error {
+
+	log.Printf("F. Comienzo planificación %s\n", startDate)
 
 	// Hay que ordenarlas antes de que asihne las tareas ya que las extrae a otro array distinto
 	plan.SortTasksByOrder()
@@ -50,6 +53,9 @@ func Planning(startDate time.Time, plan ProjectPlan) *Error {
 	plan.SetStartDate(tasks[0].GetStartDate())
 	plan.SetEndDate(tasks[0].GetEndDate())
 
+	log.Printf("StartDate %s\n", plan.GetStartDate())
+	log.Printf("EndDate %s\n", plan.GetEndDate())
+
 	var totalDuration uint
 
 	// Busca la fecha de comienzo y de fin del proyecto que será la menor fecha de inicio de una tarea y la mayor
@@ -63,6 +69,7 @@ func Planning(startDate time.Time, plan ProjectPlan) *Error {
 		if dateutil.IsGt(task.GetEndDate(), plan.GetEndDate()) {
 			plan.SetEndDate(task.GetEndDate())
 		}
+		log.Printf("%s %s %d %s %s\n", task.GetID(), task.GetSummary(), task.GetDuration(), task.GetStartDate(), task.GetEndDate())
 	}
 
 	plan.SetWorkdays(CalculateLaborableDays(plan.GetStartDate(), plan.GetEndDate(), feastDays))

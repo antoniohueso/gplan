@@ -218,6 +218,36 @@ var _ = Describe("gplan", func() {
 
 	Describe("New - Creación", func() {
 
+		When("Creamos un plan sin dependencias con una sola tarea", func() {
+
+			It("El plan debe ser igual al siguiente plan", func() {
+
+				tasks := []*Task{
+					NewTask("Tarea1", "Summary", "backend", 10, 4),
+				}
+
+				resources := []*Resource{
+					resources[1],
+				}
+
+				plan := NewProjectPlan("test-plan", tasks, resources, nil)
+				err := gplan.Planning(parseDate("2022-05-11"), plan)
+
+				Expect(err).Should(BeNil())
+
+				comparePlan(plan.Tasks, []string{
+					"2022-05-11 2022-05-16 cslopez",
+				})
+				fmt.Println(plan.Tasks[0].StartDate)
+				fmt.Println(plan.Tasks[0].EndDate)
+				Expect(plan.StartDate.Format("2006-01-02")).Should(Equal("2022-05-11"))
+				Expect(plan.EndDate.Format("2006-01-02")).Should(Equal("2022-05-16"))
+				Expect(plan.Workdays).Should(BeEquivalentTo(4))
+				Expect(plan.TotalTasks).Should(BeEquivalentTo(1))
+				Expect(plan.TotalDuration).Should(BeEquivalentTo(4))
+			})
+		})
+
 		When("Creamos un plan sin dependencias con dos días de fiesta", func() {
 
 			It("El plan debe ser igual al siguiente plan", func() {
