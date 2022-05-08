@@ -17,12 +17,17 @@ func Review(plan ProjectPlan, reviewDate time.Time) *Error {
 		feastDays = plan.GetFeastDays()
 	)
 
-	// Si el plan no está planificado aun retorna error
+	// Si el plan no está planificado aun retorna error, aprovecha el bucle para convertir las tareas a Local
 	for _, task := range tasks {
 		if task.GetResourceID() == nil {
 			return newTextError("Hay tareas sin planificar aun")
 		}
+		task.SetStartDate(task.GetStartDate().Local())
+		task.SetEndDate(task.GetEndDate().Local())
 	}
+
+	plan.SetStartDate(plan.GetStartDate().Local())
+	plan.SetEndDate(plan.GetEndDate().Local())
 
 	// Calcula el avance estimado
 	CalculateExpectedProgress(plan, reviewDate)

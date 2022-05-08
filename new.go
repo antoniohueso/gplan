@@ -11,7 +11,8 @@ import (
 // Planning Crea una nueva planificación a partir de unas tareas, recursos, vacaciones y fecha de comienzo.
 func Planning(startDate time.Time, plan ProjectPlan) *Error {
 
-	log.Printf("F. Comienzo planificación %s\n", startDate)
+	// Convierte a local startDate
+	startDate = startDate.Local()
 
 	// Hay que ordenarlas antes de que asigne las tareas ya que las extrae a otro array distinto
 	plan.SortTasksByOrder()
@@ -32,6 +33,10 @@ func Planning(startDate time.Time, plan ProjectPlan) *Error {
 	// Si la fecha de disponibilidad del recurso es menor que la fecha en la que debe comenzar el proyecto se le pone la fecha en la que debe comenzar el proyecto
 	// para que no haya ninguna tarea que comience antes
 	for _, resource := range resources {
+
+		// Convierte a local nextAvailabledate
+		resource.SetNextAvailableDate(resource.GetNextAvailableDate().Local())
+
 		if dateutil.IsLt(resource.GetNextAvailableDate(), startDate) {
 			resource.SetNextAvailableDate(startDate)
 		}

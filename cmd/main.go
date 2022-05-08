@@ -2,18 +2,14 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"time"
-
-	"github.com/antoniohueso/gplan"
 )
 
 func main() {
 
-	p, err := time.Parse(time.RFC3339, "2022-05-13T22:00:00.000+00:00")
-	if err != nil {
-		log.Println(err)
-	}
+	f1 := time.Date(2022, time.May, 14, 0, 0, 0, 0, time.Local)
 
-	fmt.Printf("%s %v", p, gplan.IsLaborableDay(p, nil))
+	fmt.Println(f1, f1.Weekday())
+	fmt.Println(f1.UTC(), f1.UTC().Weekday())
+
 }

@@ -235,8 +235,6 @@ var _ = Describe("gplan", func() {
 					log.Fatalf("Error en parse %s", err2)
 				}
 
-				fmt.Println("INICIOOOO -> ", fInicioPlan.Local())
-
 				plan := NewProjectPlan("test-plan", tasks, resources, nil)
 				err := gplan.Planning(fInicioPlan, plan)
 
@@ -245,8 +243,7 @@ var _ = Describe("gplan", func() {
 				comparePlan(plan.Tasks, []string{
 					"2022-05-11 2022-05-16 cslopez",
 				})
-				fmt.Println(plan.Tasks[0].StartDate)
-				fmt.Println(plan.Tasks[0].EndDate)
+
 				Expect(plan.StartDate.Format("2006-01-02")).Should(Equal("2022-05-11"))
 				Expect(plan.EndDate.Format("2006-01-02")).Should(Equal("2022-05-16"))
 				Expect(plan.Workdays).Should(BeEquivalentTo(4))
